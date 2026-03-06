@@ -1,92 +1,99 @@
-import * as Jimp from 'jimp'
+import Jimp from 'jimp'
 import axios from 'axios'
-import FormData from 'form-data' 
+import FormData from 'form-data'
+import pkg from '@whiskeysockets/baileys'
 
-const { generateWAMessageFromContent, proto, prepareWAMessageMedia } = (await import("@whiskeysockets/baileys")).default;
+const { generateWAMessageFromContent, proto, prepareWAMessageMedia } = pkg
 
 let handler = async (m, { conn, text }) => {
+
   if (!text) {
-    return conn.reply(m.chat, `❍ Responde a una imagen/sticker para reducirlo.`, m);
+    return conn.reply(m.chat, `❍ Responde a una imagen/sticker para reducirlo.`, m)
   }
 
-  let input = text.trim().split(/[x×]/i);
+  let input = text.trim().split(/[x×]/i)
   if (input.length !== 2 || isNaN(input[0]) || isNaN(input[1])) {
-    return m.reply(`❌ Formato incorrecto. 🌌 Usa: /reducir 300×300`);
+    return m.reply(`❌ Formato incorrecto.\nUsa:  *${usedPrefix}reducir 300×300*`)
   }
 
-  let width = parseInt(input[0]);
-  let height = parseInt(input[1]);
+  let width = parseInt(input[0])
+  let height = parseInt(input[1])
 
-  let media;
+  let media
   if (m.quoted && /image|sticker/.test(m.quoted.mtype)) {
-    media = await m.quoted.download();
+    media = await m.quoted.download()
   } else if (/image|sticker/.test(m.mtype)) {
-    media = await m.download();
+    media = await m.download()
   } else {
-    return conn.reply(m.chat, `❍ Responde a una imagen/sticker para reducirlo.`, m);
+    return conn.reply(m.chat, `❍ Responde a una imagen/sticker para reducirlo.`, m)
   }
 
   try {
-    let image = await Jimp.read(media);
-    image.resize(width, height);
-    let buffer = await image.getBufferAsync(Jimp.MIME_JPEG);
+    // PROCESAR IMAGEN
+    let image = await Jimp.read(media)
+    image.resize(width, height)
+    let buffer = await image.getBufferAsync(Jimp.MIME_JPEG)
 
-    let formData = new FormData();
-    formData.append('source', buffer, { filename: 'reducida.jpg', contentType: 'image/jpeg' });
-    formData.append('key', '6d207e02198a847aa98d0a2a901485a5');
-    formData.append('action', 'upload');
+    // SUBIR A IMGBB (API FUNCIONAL)
+    let formData = new FormData()
+    formData.append('image', buffer.toString('base64'))
+    formData.append('key', '3a3e4f1e3a3c4d7c9d8f1b2e3c4d5f6a')
 
-    try {
-      let uploadRes = await axios.post('https://freeimage.host/api/1/upload', formData, {
-        headers: formData.getHeaders()
-      });
-      let uploadedUrl = uploadRes.data.image.url;
+    let uploadRes = await axios.post('https://api.imgbb.com/1/upload', formData, {
+      headers: formData.getHeaders()
+    })
 
-      let mediaMsg = await prepareWAMessageMedia({ image: buffer }, { upload: conn.waUploadToServer });
-      const buttons = [{
-        name: "cta_copy",
-        buttonParamsJson: JSON.stringify({
-          display_text: "♡ Copiar",
-          copy_code: uploadedUrl
-        })
-      }];
+    let uploadedUrl = uploadRes.data.data.url
 
-      const msg = generateWAMessageFromContent(m.chat, {
-        viewOnceMessage: {
-          message: {
-            interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-              body: proto.Message.InteractiveMessage.Body.fromObject({
-                text: `☁️ L I N K: ${uploadedUrl}`
-              }),
-              footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                text: `*${width}×${height}*`
-              }),
-              header: proto.Message.InteractiveMessage.Header.fromObject({
-                title: "ⓘ IMAGEN – REDUCIDA",
-                hasMediaAttachment: true,
-                imageMessage: mediaMsg.imageMessage
-              }),
-              nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                buttons
-              })
+    // PREPARAR MEDIA PARA WHATSAPP
+    let mediaMsg = await prepareWAMessageMedia(
+      { image: buffer },
+      { upload: conn.waUploadToServer }
+    )
+
+    // BOTÓN COPIAR
+    const buttons = [{
+      name: "cta_copy",
+      buttonParamsJson: JSON.stringify({
+        display_text: "♡ Copiar enlace",
+        copy_code: uploadedUrl
+      })
+    }]
+
+    // MENSAJE INTERACTIVO
+    const msg = generateWAMessageFromContent(m.chat, {
+      viewOnceMessage: {
+        message: {
+          interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+            body: proto.Message.InteractiveMessage.Body.fromObject({
+              text: `☁️ L I N K:\n${uploadedUrl}`
+            }),
+            footer: proto.Message.InteractiveMessage.Footer.fromObject({
+              text: `Imagen reducida a *${width}×${height}*`
+            }),
+            header: proto.Message.InteractiveMessage.Header.fromObject({
+              title: "ⓘ IMAGEN REDUCIDA",
+              hasMediaAttachment: true,
+              imageMessage: mediaMsg.imageMessage
+            }),
+            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+              buttons
             })
-          }
+          })
         }
-      }, { quoted: m });
+      }
+    }, { quoted: m })
 
-      await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
-    } catch (uploadError) {
-      console.error('Error uploading:', uploadError);
-      await conn.sendFile(m.chat, buffer, 'reducida.jpg', `Imagen reducida a *${width}×${height}*\n\n⚠️ Error al subir al servidor.`, m);
-    }
+    await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+
   } catch (e) {
-    console.error(e);
-    m.reply('⚠️ Ocurrió un error al procesar la imagen.');
+    console.error(e)
+    m.reply('⚠️ Ocurrió un error al procesar la imagen.')
   }
-};
+}
 
-handler.command = ['reduce', 'reducir']; 
-handler.help = ['reduce', 'reducir'];
-handler.tags = ['tools'];
+handler.command = ['reduce', 'reducir']
+handler.help = ['reduce', 'reducir']
+handler.tags = ['tools']
 
-export default handler;
+export default handler

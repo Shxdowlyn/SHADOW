@@ -94,8 +94,8 @@ ${readMore}
 
 
    const icon = [
-     'https://adofiles.i11.eu/dl/m4dv.jpg',
-     'https://adofiles.i11.eu/dl/m4dv.jpg'
+     'https://i.postimg.cc/rFfVL8Ps/image.jpg',
+     'https://i.postimg.cc/rFfVL8Ps/image.jpg'
    ]
    let icons = icon[Math.floor(Math.random() * icon.length)]
 

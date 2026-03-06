@@ -117,15 +117,15 @@ ${readMore}
           title: `⌗ֶㅤ𝐌𝐞𝐧𝐮 𝐝𝐞 𝐥𝐚 𝐒𝐨𝐦𝐛𝐫𝐚 - ${botname} 𝅄⚜︎`,
           description: "« Soy quien actúa en las sombras, fingiendo ser un simple extra. »",
           currencyCode: "USD",
-          priceAmount1000: 10000,
+          priceAmount1000: 0000,
           retailerId: "menu"
         },
-        businessOwnerJid: "51919199620@s.whatsapp.net"
+        businessOwnerJid: "584242773183@s.whatsapp.net"
       }
     }
   }
 
-await m.react('⚜︎')
+await m.react('🔥')
 await conn.sendMessage(m.chat, { 
 text: infoUser + menuTexto,
 contextInfo: {

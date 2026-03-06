@@ -174,8 +174,8 @@ Inicia el bot nuevamente:
 <a href="https://github.com/GianPoolS">
   <img src="https://github.com/GianPoolS.png" width="80" height="80" style="border-radius:50%">
 </a>
-<a href="https://github.com/the-xyzz">
-  <img src="https://github.com/the-xyzz.png" width="80" height="80" style="border-radius:50%">
+<a href="https://github.com/DevZylJx">
+  <img src="https://github.com/DevZylJx.png" width="80" height="80" style="border-radius:50%">
 </a>
 <a href="https://github.com/SoySapo6">
   <img src="https://github.com/SoySapo6.png" width="80" height="80" style="border-radius:50%">
@@ -198,6 +198,7 @@ Inicia el bot nuevamente:
 🖤 Gracias por apoyar SHADOW-BOT-MD
 
 Tu estrella ⭐ y tu fork ayudan a que este proyecto siga creciendo.
+
 
 
 

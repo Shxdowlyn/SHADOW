@@ -9,7 +9,8 @@ export async function before(m, { conn }) {
   user.afk = typeof user.afk === 'number' ? user.afk : -1
   user.afkReason = typeof user.afkReason === 'string' ? user.afkReason : ''
 
-  const thumb = await (await fetch('https://i.postimg.cc/rFfVL8Ps/image.jpg')).buffer()
+  const res = await fetch('https://i.postimg.cc/rFfVL8Ps/image.jpg')
+  const thumb = Buffer.from(await res.arrayBuffer())
 
   const shadow_xyz = {
     key: {
@@ -101,4 +102,4 @@ export async function before(m, { conn }) {
   }
 
   return true
-          }
+    }

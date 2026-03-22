@@ -40,16 +40,14 @@ handler.register = true
 handler.command = ['simi']
 export default handler
 
-// API nueva: usa SOLO q=
+// API nueva: usa SOLO q= y la respuesta está en resultado.respuesta
 async function luminsesi(prompt) {
   try {
     const url = `https://apiaxi.i11.eu/ai/gemini?q=${encodeURIComponent(prompt)}`
     const response = await axios.get(url)
 
-    if (response.data?.message) {
-      return response.data.message
-    } else if (response.data?.mensaje) {
-      return response.data.mensaje
+    if (response.data?.resultado?.respuesta) {
+      return response.data.resultado.respuesta
     } else {
       return "🤖 No pude generar una respuesta, intenta otra vez."
     }
@@ -58,4 +56,4 @@ async function luminsesi(prompt) {
     console.error('*[ ℹ️ ] Error al obtener:*', error)
     throw error
   }
-      }
+    }

@@ -69,7 +69,7 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
     const msg = `🎶 *Shadow — Descarga en curso*
 
 ✨ *Título:* ${title}
-🌌 Preparando tu ${type === "mp3" ? "audio espera un poco..." : "video"}...`
+🌌 Preparando tu ${type === "mp3" ? "audio..." : "video..."} aguarda.`
 
     let sent
     if (thumbnail) {
@@ -86,19 +86,21 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
       )
     }
 
-    const apiUrl = type === "mp3"
-      ? `https://api-adonix.ultraplus.click/download/ytaudio?url=${encodeURIComponent(url)}&apikey=SHADOWBOTKEYMD`
-      : `https://api-adonix.ultraplus.click/download/ytvideo?url=${encodeURIComponent(url)}&apikey=SHADOWBOTKEYMD`
+    // 🔥 NUEVAS APIS SIN KEY
+    const apiUrl =
+      type === "mp3"
+        ? `https://apiaxi.i11.eu/down/ytaudio?url=${encodeURIComponent(url)}`
+        : `https://apiaxi.i11.eu/down/ytvideo?url=${encodeURIComponent(url)}`
 
     const response = await fetch(apiUrl)
     const data = await response.json()
 
-    if (!data?.status || !data?.data?.url) {
+    if (!data?.status || !data?.resultado?.url_dl) {
       throw new Error("La API no devolvió un archivo válido.")
     }
 
-    const fileUrl = data.data.url
-    const fileTitle = data.data.title || title
+    const fileUrl = data.resultado.url_dl
+    const fileTitle = data.resultado.titulo || title
 
     if (type === "mp3") {
       await conn.sendMessage(
@@ -154,11 +156,19 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
   }
 }
 
-const cleanName = (name) => name.replace(/[^\w\s-_.]/gi, "").substring(0, 50)
+const cleanName = (name) =>
+  name.replace(/[^\w\s-_.]/gi, "").substring(0, 50)
 
-handler.command = handler.help = ["ytmp3", "playvid", "ytv", "ytmp4", "play2", "yt"]
+handler.command = handler.help = [
+  "ytmp3",
+  "playvid",
+  "ytv",
+  "ytmp4",
+  "play2",
+  "yt"
+]
+
 handler.tags = ["descargas"]
 handler.register = true
 
-export default handler            
-      
+export default handler

@@ -23,7 +23,10 @@ const handler = async (m, { conn, text }) => {
       durationTimestamp = video.timestamp
       views = video.views
       url = video.url
-      thumbnail = video = formatViews(views)
+      thumbnail = video.thumbnail
+    }
+
+    const vistas = formatViews(views)
 
     const res3 = await fetch("https://files.catbox.moe/wfd0ze.jpg")
     const thumb3 = Buffer.from(await res3.arrayBuffer())
@@ -34,7 +37,8 @@ const handler = async (m, { conn, text }) => {
         participant: "0@s.whatsapp.net",
         remoteJid: "status@broadcast"
       },
-     : {
+      message: {
+        locationMessage: {
           name: `『 ${title} 』`,
           jpegThumbnail: thumb3
         }
@@ -89,37 +93,46 @@ const downloadMedia = async (conn, m, url, quotedMsg) => {
       { quoted: m }
     )
 
-    // Nueva API sin key
     const apiUrl = `https://apiaxi.i11.eu/down/ytaudio?url=${encodeURIComponent(url)}`
-    const r = await fetch(apiUrl)
 
-    if (!r.ok) {
-      return m.reply("🚫 La API no respondió correctamente.")
+    let fileUrl = null
+    let fileTitle = "audio"
+
+    // 1️⃣ Intentar leer JSON
+    let data = null
+    try {
+      const r = await fetch(apiUrl)
+      const text = await r.text()
+
+      try {
+        data = JSON.parse(text)
+      } catch {
+        data = null
+      }
+
+      if (data) {
+        fileUrl =
+          data.url ||
+          data.download_url ||
+          data.result?.url ||
+          data.result?.download_url
+
+        fileTitle =
+          cleanName(
+            data.title ||
+            data.result?.title ||
+            "audio"
+          )
+      }
+    } catch (e) {
+      data = null
     }
 
-    const data = await r.json().catch(() => null)
-
-    if (!data) {
-      return m.reply("🚫 No se pudo leer la respuesta de la API.")
-    }
-
-    // Soportar varias estructuras posibles
-    const fileUrl =
-      data.url ||
-      data.download_url ||
-      data.result?.url ||
-      data.result?.download_url
-
-    const rawTitle =
-      data.title ||
-      data.result?.title ||
-      "audio"
-
+    // 2️⃣ Si no hay JSON válido o no hay url en el JSON, usar directamente la API como archivo
     if (!fileUrl) {
-      return m.reply("🚫 No se encontró el enlace de descarga en la API.")
+      fileUrl = apiUrl
+      fileTitle = "audio"
     }
-
-    const fileTitle = cleanName(rawTitle)
 
     await conn.sendMessage(
       m.chat,

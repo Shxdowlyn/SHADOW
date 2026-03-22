@@ -93,15 +93,15 @@ const downloadMedia = async (conn, m, url, quotedMsg) => {
       { quoted: m }
     )
 
-    const apiUrl = `https://api-adonix.ultraplus.click/download/ytaudio?url=${encodeURIComponent(url)}&apikey=SHADOWBOTKEYMD`
+    const apiUrl = `https://apiaxi.i11.eu/down/ytaudio?url=${encodeURIComponent(url)}`
     const r = await fetch(apiUrl)
     const data = await r.json()
 
-    if (!data?.status || !data?.data?.url)
+    if (!data?.status || !data?.result?.url)
       return m.reply("🚫 No se pudo descargar el archivo.")
 
-    const fileUrl = data.data.url
-    const fileTitle = cleanName(data.data.title || "audio")
+    const fileUrl = data.result.url
+    const fileTitle = cleanName(data.result.title || "audio")
 
     await conn.sendMessage(
       m.chat,

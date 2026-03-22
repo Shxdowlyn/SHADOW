@@ -77,7 +77,7 @@ const handler = async (m, { conn, text }) => {
       { quoted: fkontak }
     )
 
-    await downloadMedia(conn, m, url, fkontak)
+    await downloadAudio(conn, m, url, fkontak)
 
     await m.react("✅")
   } catch (e) {
@@ -86,7 +86,7 @@ const handler = async (m, { conn, text }) => {
   }
 }
 
-const downloadMedia = async (conn, m, url, quotedMsg) => {
+const downloadAudio = async (conn, m, url, quotedMsg) => {
   try {
     const sent = await conn.sendMessage(
       m.chat,
@@ -96,31 +96,40 @@ const downloadMedia = async (conn, m, url, quotedMsg) => {
 
     const apiUrl = `https://apiaxi.i11.eu/down/ytaudio?url=${encodeURIComponent(url)}`
 
-    // Descargar el archivo directamente (stream)
-    const response = await fetch(apiUrl)
+    // Forzar user-agent y seguir redirecciones
+    const response = await fetch(apiUrl, {
+      redirect: "follow",
+      headers: {
+        "User-Agent": "Mozilla/5.0"
+      }
+    })
 
-    if (!response.ok) {
-      return m.reply("🚫 La API no respondió correctamente.")
+    const buffer = Buffer.from(await response.arrayBuffer())
+
+    // Detectar si la API devolvió HTML (error)
+    const textCheck = buffer.toString("utf8").slice(0, 50)
+    if (textCheck.includes("<html") || textCheck.includes("DOCTYPE")) {
+      return m.reply("🚫 La API devolvió un error en HTML.")
     }
 
-    // Detectar tipo MIME real
-    const contentType = response.headers.get("content-type") || "audio/mpeg"
+    // Detectar archivo vacío
+    if (buffer.length < 5000) {
+      return m.reply("🚫 La API devolvió un archivo vacío.")
+    }
 
     // Guardar archivo temporal
     const tempPath = path.join(__dirname, "temp_audio")
     if (!fs.existsSync(tempPath)) fs.mkdirSync(tempPath)
 
-    const filePath = path.join(tempPath, "audio_tmp")
-
-    const buffer = Buffer.from(await response.arrayBuffer())
+    const filePath = path.join(tempPath, "audio.mp3")
     fs.writeFileSync(filePath, buffer)
 
-    // Enviar audio con MIME correcto
+    // Enviar audio
     await conn.sendMessage(
       m.chat,
       {
         audio: fs.readFileSync(filePath),
-        mimetype: contentType,
+        mimetype: "audio/mpeg",
         fileName: "audio.mp3",
         ptt: false
       },
@@ -131,7 +140,7 @@ const downloadMedia = async (conn, m, url, quotedMsg) => {
 
     await conn.sendMessage(
       m.chat,
-      { text: `✅ Descarga completada\n\n🎼 Título: audio`, edit: sent.key }
+      { text: `✅ Descarga completada`, edit: sent.key }
     )
 
   } catch (e) {

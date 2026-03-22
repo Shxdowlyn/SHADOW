@@ -40,10 +40,10 @@ handler.register = true
 handler.command = ['simi']
 export default handler
 
-// 🔥 Nueva función usando la API sin clave
+// Usa la nueva API sin clave, manteniendo text y role
 async function luminsesi(q, logic) {
   try {
-    const url = `https://apiaxi.i11.eu/ai/gemini?text=${encodeURIComponent(q)}&prompt=${encodeURIComponent(logic)}`
+    const url = `https://apiaxi.i11.eu/ai/gemini?text=${encodeURIComponent(q)}&role=${encodeURIComponent(logic)}`
     const response = await axios.get(url)
 
     if (response.data?.message) {
@@ -56,4 +56,4 @@ async function luminsesi(q, logic) {
     console.error('*[ ℹ️ ] Error al obtener:*', error)
     throw error
   }
-    }
+      }

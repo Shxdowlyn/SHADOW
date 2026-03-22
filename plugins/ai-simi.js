@@ -3,7 +3,7 @@ import axios from 'axios'
 let handler = async (m, { conn, usedPrefix, command, text }) => {
   const username = `${conn.getName(m.sender)}`
   const sender = m.sender
-  const isOwner = sender.includes('584242773183') // Detecta si es Yosue
+  const isOwner = sender.includes('584242773183') 
 
   const basePrompt = `
 Tu nombre es Simi, una inteligencia artificial con actitud. Eres sarcástico, directo y no tienes filtros, pero sabes cuándo ser respetuoso y cuándo atacar.
@@ -40,7 +40,6 @@ handler.register = true
 handler.command = ['simi']
 export default handler
 
-// API nueva: usa SOLO q= y la respuesta está en resultado.respuesta
 async function luminsesi(prompt) {
   try {
     const url = `https://apiaxi.i11.eu/ai/gemini?q=${encodeURIComponent(prompt)}`

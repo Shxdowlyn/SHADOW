@@ -25,8 +25,8 @@ Ahora responde lo siguiente:
   await conn.sendPresenceUpdate('composing', m.chat)
 
   try {
-    const prompt = `${basePrompt} ${text}`
-    const response = await luminsesi(text, prompt)
+    const fullPrompt = `${basePrompt} ${text}`
+    const response = await luminsesi(fullPrompt)
     await conn.reply(m.chat, response, m)
   } catch (error) {
     console.error('*[ ℹ️ ] Error al obtener la respuesta:*', error)
@@ -40,10 +40,10 @@ handler.register = true
 handler.command = ['simi']
 export default handler
 
-// Usa la nueva API sin clave, manteniendo text y role
-async function luminsesi(q, logic) {
+// API nueva: SOLO usa text=
+async function luminsesi(prompt) {
   try {
-    const url = `https://apiaxi.i11.eu/ai/gemini?text=${encodeURIComponent(q)}&role=${encodeURIComponent(logic)}`
+    const url = `https://apiaxi.i11.eu/ai/gemini?text=${encodeURIComponent(prompt)}`
     const response = await axios.get(url)
 
     if (response.data?.message) {
@@ -56,4 +56,4 @@ async function luminsesi(q, logic) {
     console.error('*[ ℹ️ ] Error al obtener:*', error)
     throw error
   }
-      }
+                         }

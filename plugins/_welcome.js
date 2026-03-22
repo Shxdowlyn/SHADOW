@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 export async function before(m, { conn, participants, groupMetadata}) {
   if (!m.messageStubType ||!m.isGroup) return true;
 
-  let vn = 'https://files.catbox.moe/9fyuwb.m4a';
+  let vn = 'https://adofiles.i11.eu/dl/l51i.mp4';
   let vn2 = 'https://adofiles.i11.eu/dl/gsqq.m4a';
   let chat = global.db.data.chats[m.chat];
   const getMentionedJid = () => {

@@ -6,7 +6,7 @@ import moment from 'moment-timezone'
 
 const botname = global.botname || "Shadow Garden"
 const dev = global.dev || "Cid Kagenou"
-const banner = global.banner || "https://files.catbox.moe/gbp5x3.jpg"
+const videoMenu = "https://files.catbox.moe/41gtac.mp4"
 const channelRD = global.channelRD || { id: "0@newsletter", name: "Shadow Channel" }
 
 let handler = async (m, { conn, usedPrefix, dirname, participants }) => {
@@ -94,13 +94,6 @@ ${comandos}
 ${readMore}
   乂 *ᴘʀᴏᴛᴏᴄᴏʟᴏ ᴅᴇ ᴄᴏᴍᴀɴᴅᴏꜱ ᴅᴇ ʟᴀ ꜱᴏᴍʙʀᴀ* 乂\n`.trim()
 
-   const icon = [
-     'https://i.postimg.cc/rFfVL8Ps/image.jpg',
-     'https://i.postimg.cc/rFfVL8Ps/image.jpg'
-   ]
-   let icons = icon[Math.floor(Math.random() * icon.length)]
-
-  const Shadow_url = await (await fetch(icons)).buffer()
   const fkontak = {
     key: {
       fromMe: false,
@@ -112,7 +105,7 @@ ${readMore}
         product: {
           productImage: {
             mimetype: "image/jpeg",
-            jpegThumbnail: Shadow_url
+            jpegThumbnail: await (await fetch(videoMenu)).buffer()
           },
           title: `⌗ֶㅤ𝐌𝐞𝐧𝐮 𝐝𝐞 𝐥𝐚 𝐒𝐨𝐦𝐛𝐫𝐚 - ${botname} 𝅄⚜︎`,
           description: "« Soy quien actúa en las sombras, fingiendo ser un simple extra. »",
@@ -127,7 +120,9 @@ ${readMore}
 
 await m.react('🔥')
 await conn.sendMessage(m.chat, { 
-text: infoUser + menuTexto,
+video: { url: videoMenu },
+caption: infoUser + menuTexto,
+gifPlayback: true,
 contextInfo: {
  isForwarded: true,
  forwardedNewsletterMessageInfo: {
@@ -141,7 +136,7 @@ contextInfo: {
    mediaType: 1,
    mediaUrl: null,
    sourceUrl: null,
-   thumbnail: await (await fetch(banner)).buffer(),
+   thumbnail: await (await fetch(videoMenu)).buffer(),
    showAdAttribution: false,
    containsAutoReply: true,
    renderLargerThumbnail: true
@@ -167,4 +162,4 @@ function clockString(ms) {
   const m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60
   const s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
   return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':')
-}
+      }

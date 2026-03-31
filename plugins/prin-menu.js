@@ -7,23 +7,17 @@ import moment from 'moment-timezone'
 const botname = global.botname || "Shadow Garden"
 const dev = global.dev || "Cid Kagenou"
 const videoMenu = "https://files.catbox.moe/41gtac.mp4"
+// Imagen para miniaturas (necesaria para que no de error el mensaje)
+const thumbMenu = "https://files.catbox.moe/gbp5x3.jpg" 
 const channelRD = global.channelRD || { id: "0@newsletter", name: "Shadow Channel" }
 
 let handler = async (m, { conn, usedPrefix, dirname, participants }) => {
   try {
-
     let mentionedJid = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.sender
-    let user = global.db.data.users[m.sender] || {}
     let name = await conn.getName(m.sender)
     let totalreg = Object.keys(global.db.data.users).length
-    let groupUserCount = m.isGroup ? participants.length : '-'
     let groupsCount = Object.values(conn.chats).filter(v => v.id.endsWith('@g.us')).length
     let uptime = clockString(process.uptime() * 1000)
-    let fecha = new Date(Date.now())
-    let locale = 'es-PE'
-    let dia = fecha.toLocaleDateString(locale, { weekday: 'long' })
-    let fechaTxt = fecha.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
-    let hora = fecha.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
     let totalCommands = Object.keys(global.plugins).length
     let readMore = String.fromCharCode(8206).repeat(4001)
 
@@ -75,40 +69,27 @@ ${comandos}
       }
     }
 
-    let date = `${dia}, ${fechaTxt}, ${hora}`
     let infoUser = `
 > . ݁  🌑՞ *ʙɪᴇɴᴠᴇɴɪᴅᴏ ᴀ ʟᴀ ꜱᴏᴍʙʀᴀ,* ${name}.
->    ʏᴀ ᴇꜱᴛᴀʙᴀ ᴇꜱᴄᴜᴄhᴀɴᴅᴏ ᴛᴜꜱ ᴘᴀꜱᴏꜱ...
 
 > ﹙⚜︎﹚੭੭ ─ \`ɪ ɴ ғ ᴏ - ꜱʜᴀᴅᴏᴡ ʙᴏᴛ\`
-> ര ׄ 𓏸𓈒 ׅ *ɴᴏᴍʙʀᴇ ᴄʟᴀᴠᴇ ›* ${conn.user?.name || 'Shadow Unit'}
-> ര ׄ 𓏸𓈒 ׅ *ᴄʟᴀꜱɪꜰɪᴄᴀᴄɪᴏɴ ›* ${(conn.user.jid == global.conn.user.jid ? '𝐍𝐮́𝐜𝐥𝐞𝐨 𝐏𝐫𝐢𝐧𝐜𝐢𝐩𝐚𝐥' : '𝐔𝐧𝐢𝐝𝐚𝐝 𝐒𝐮𝐛𝐨𝐫𝐝𝐢𝐧𝐚𝐝𝐚')}
 > ര ׄ 𓏸𓈒 ׅ *ᴄᴏᴍᴀɴᴅᴏꜱ ›* ${totalCommands}
-> ര ׄ 𓏸𓈒 ׅ *ᴛɪᴇᴍᴘᴏ ᴇɴ ʟᴀ ꜱᴏᴍʙʀᴀ ›* ${uptime}
+> ര ׄ 𓏸𓈒 ׅ *ᴛɪᴇᴍᴘᴏ ›* ${uptime}
 > ര ׄ 𓏸𓈒 ׅ *ᴅᴏᴍɪɴɪᴏ ›* ${pais}
 > ര ׄ 𓏸𓈒 ׅ *ᴀʟᴍᴀꜱ ›* ${totalreg}
-> ര ׄ 𓏸𓈒 ׅ *ᴄᴇʟᴅᴀꜱ ›* ${groupsCount}
-> ര ׄ 𓏸𓈒 ׅ *ᴛɪᴇᴍᴘᴏ ›* ${date}
-> ര ׄ 𓏸𓈒 ׅ *ᴄᴀɴᴀʟ ᴅᴇ ʟᴀ ᴏꜱᴄᴜʀɪᴅᴀᴅ xᴅ ›* https://whatsapp.com/channel/0029VbArz9fAO7RGy2915k3O
+> ര ׄ 𓏸𓈒 ׅ *ᴄᴀɴᴀʟ ›* https://whatsapp.com/channel/0029VbArz9fAO7RGy2915k3O
 
 ${readMore}
   乂 *ᴘʀᴏᴛᴏᴄᴏʟᴏ ᴅᴇ ᴄᴏᴍᴀɴᴅᴏꜱ ᴅᴇ ʟᴀ ꜱᴏᴍʙʀᴀ* 乂\n`.trim()
 
   const fkontak = {
-    key: {
-      fromMe: false,
-      participant: "0@s.whatsapp.net",
-      remoteJid: "status@broadcast"
-    },
+    key: { fromMe: false, participant: "0@s.whatsapp.net", remoteJid: "status@broadcast" },
     message: {
       productMessage: {
         product: {
-          productImage: {
-            mimetype: "image/jpeg",
-            jpegThumbnail: await (await fetch(videoMenu)).buffer()
-          },
-          title: `⌗ֶㅤ𝐌𝐞𝐧𝐮 𝐝𝐞 𝐥𝐚 𝐒𝐨𝐦𝐛𝐫𝐚 - ${botname} 𝅄⚜︎`,
-          description: "« Soy quien actúa en las sombras, fingiendo ser un simple extra. »",
+          productImage: { mimetype: "image/jpeg", jpegThumbnail: await (await fetch(thumbMenu)).buffer() },
+          title: `⌗ֶㅤ𝐌𝐞𝐧𝐮 𝐝𝐞 𝐥𝐚 𝐒𝐨𝐦𝐛𝐫𝐚`,
+          description: "« Soy quien actúa en las sombras »",
           currencyCode: "USD",
           priceAmount1000: 0,
           retailerId: "menu"
@@ -118,36 +99,35 @@ ${readMore}
     }
   }
 
-await m.react('🔥')
-await conn.sendMessage(m.chat, { 
-video: { url: videoMenu },
-caption: infoUser + menuTexto,
-gifPlayback: true,
-contextInfo: {
- isForwarded: true,
- forwardedNewsletterMessageInfo: {
-   newsletterJid: channelRD.id,
-   serverMessageId: '',
-   newsletterName: channelRD.name
- },
- externalAdReply: {
-   title: `${botname} ┊ Organización en las Sombras`,
-   body: `Dirigido por ${dev}, el que juega a ser un simple mob.`,
-   mediaType: 1,
-   mediaUrl: null,
-   sourceUrl: null,
-   thumbnail: await (await fetch(videoMenu)).buffer(),
-   showAdAttribution: false,
-   containsAutoReply: true,
-   renderLargerThumbnail: true
- }}}, { quoted: fkontak })
+  await m.react('🔥')
+  
+  // Enviamos el mensaje con el video y las miniaturas corregidas
+  await conn.sendMessage(m.chat, { 
+    video: { url: videoMenu },
+    caption: infoUser + menuTexto,
+    gifPlayback: true,
+    contextInfo: {
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterJid: channelRD.id,
+        serverMessageId: '',
+        newsletterName: channelRD.name
+      },
+      externalAdReply: {
+        title: `${botname}  organizacional`,
+        body: `By ${dev}`,
+        mediaType: 1,
+        sourceUrl: null,
+        thumbnailUrl: thumbMenu, // Usamos URL directa para evitar errores de buffer
+        renderLargerThumbnail: true,
+        showAdAttribution: false
+      }
+    }
+  }, { quoted: fkontak })
 
 } catch (e) {
    console.error(e)
-   await conn.sendMessage(m.chat, { 
-     text: `✘ Un fallo ha surgido entre las sombras: ${e.message}`,
-     mentionedJid: [mentionedJid]
-   })
+   await conn.sendMessage(m.chat, { text: `✘ Error: ${e.message}` })
  }
 }
 
@@ -162,4 +142,4 @@ function clockString(ms) {
   const m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60
   const s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
   return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':')
-      }
+  }

@@ -57,9 +57,9 @@ Opinión 2`;
   await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
 };
 
-handler.help = ['test'];
+handler.help = ['tests'];
 handler.tags = ['test'];
-handler.command = /^(test)$/i;
+handler.command = /^(tests)$/i;
 
 export default handler;
 

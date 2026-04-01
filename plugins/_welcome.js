@@ -1,16 +1,16 @@
 import fs from 'fs'
-import { WAMessageStubType} from '@whiskeysockets/baileys'
+import { WAMessageStubType } from '@whiskeysockets/baileys'
 
-const newsletterJid = '120363423523597117@newsletter';
-const newsletterName = '👑 SHADOW-BOT-MD| ᴄʜᴀɴɴᴇʟ-ʙᴏᴛ 🌌';
+const newsletterJid = '120363423523597117@newsletter'
+const newsletterName = '👑 SHADOW-BOT-MD| ᴄʜᴀɴɴᴇʟ-ʙᴏᴛ 🌌'
 const packname = 'shadow-BOT-MD'
 
 const iconos = [
   'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165065152-94d843.jpg',
   'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165081580-660d44.jpg',
   'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165160074-de0e81.jpg',
-  'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165128396-b5e568.jpg',
-];
+  'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165128396-b5e568.jpg'
+]
 
 const welcomeBannerData = {
   "status": 200,
@@ -51,24 +51,24 @@ const welcomeBannerData = {
       }
     ]
   }
-};
+}
 
-const getRandomIcono = () => iconos[Math.floor(Math.random() * iconos.length)];
+const getRandomIcono = () => iconos[Math.floor(Math.random() * iconos.length)]
 
-async function generarBienvenida({ conn, userId, groupMetadata, chat}) {
-  const username = `@${userId.split('@')[0]}`;
-  const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg');
-  const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric'});
-  const groupSize = groupMetadata.participants.length + 1;
-  const desc = groupMetadata.desc?.toString() || 'Sin descripción';
+async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
+  const username = `@${userId.split('@')[0]}`
+  const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg')
+  const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric' })
+  const groupSize = groupMetadata.participants.length + 1
+  const desc = groupMetadata.desc?.toString() || 'Sin descripción'
 
-  let caption;
+  let caption
   if (chat.welcomeText) {
     caption = chat.welcomeText
-.replace(/@user/g, username)
-.replace(/@subject/g, groupMetadata.subject)
-.replace(/@desc/g, desc);
-} else {
+      .replace(/@user/g, username)
+      .replace(/@subject/g, groupMetadata.subject)
+      .replace(/@desc/g, desc)
+  } else {
     const defaultWelcomeMessage = `╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐈𝐍𝐈𝐂𝐈𝐎 」─╮
 
 @user ha sido convocado por las sombras...
@@ -83,27 +83,28 @@ Tu poder será forjado en silencio. Tu lealtad, puesta a prueba.
 📜 Descripción:
 ${desc}
 
-> Usa *#setwelcome* para personalizar este mensaje.`;
+> Usa *#setwelcome* para personalizar este mensaje.`
 
     caption = defaultWelcomeMessage
-.replace(/@user/g, username)
-.replace(/@subject/g, groupMetadata.subject);
-}
-  return { pp, caption, mentions: [userId]};
+      .replace(/@user/g, username)
+      .replace(/@subject/g, groupMetadata.subject)
+  }
+
+  return { pp, caption, mentions: [userId] }
 }
 
-async function generarDespedida({ conn, userId, groupMetadata, chat}) {
-  const username = `@${userId.split('@')[0]}`;
-  const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165081580-660d44.jpg');
-  const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric'});
-  const groupSize = groupMetadata.participants.length - 1;
+async function generarDespedida({ conn, userId, groupMetadata, chat }) {
+  const username = `@${userId.split('@')[0]}`
+  const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165081580-660d44.jpg')
+  const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric' })
+  const groupSize = groupMetadata.participants.length - 1
 
-  let caption;
+  let caption
   if (chat.byeText) {
     caption = chat.byeText
-.replace(/@user/g, username)
-.replace(/@subject/g, groupMetadata.subject);
-} else {
+      .replace(/@user/g, username)
+      .replace(/@subject/g, groupMetadata.subject)
+  } else {
     const defaultByeMessage = `╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐑𝐄𝐓𝐈𝐑𝐀𝐃𝐀 」─╮
 
 @user ha abandonado el círculo de las sombras.
@@ -118,27 +119,29 @@ Las sombras no olvidan, pero tampoco lloran.
 📉 Miembros: ${groupSize}
 📅 Fecha: ${fecha}
 
-> Usa *#setbye* para personalizar este mensaje.`;
+> Usa *#setbye* para personalizar este mensaje.`
 
     caption = defaultByeMessage
-.replace(/@user/g, username)
-.replace(/@subject/g, groupMetadata.subject);
+      .replace(/@user/g, username)
+      .replace(/@subject/g, groupMetadata.subject)
+  }
+
+  return { pp, caption, mentions: [userId] }
 }
-  return { pp, caption, mentions: [userId]};
-}
 
-let handler = m => m;
+let handler = m => m
 
-handler.before = async function (m, { conn, participants, groupMetadata}) {
-  if (!m.messageStubType || !m.isGroup) return !0;
+handler.before = async function (m, { conn, participants, groupMetadata }) {
+  if (!m.messageStubType || !m.isGroup) return !0
 
-  const chat = global.db.data.chats[m.chat];
-  if (!chat) return !0;
+  const chat = global.db.data.chats[m.chat]
+  if (!chat) return !0
 
-  const primaryBot = chat.botPrimario;
-  if (primaryBot && conn.user.jid !== primaryBot) return !0;
+  const primaryBot = chat.botPrimario
+  if (primaryBot && conn.user.jid !== primaryBot) return !0
 
-  const userId = m.messageStubParameters[0];
+  const userId = m.messageStubParameters[0]
+  const username = '@' + userId.split('@')[0]
 
   const fkontak = {
     key: {
@@ -158,18 +161,17 @@ TEL;type=CELL;type=VOICE;waid=0:+0
 END:VCARD`
       }
     }
-  };
+  }
 
   if (chat.welcome && m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
-
-    const { pp, caption, mentions } = await generarBienvenida({ conn, userId, groupMetadata, chat });
+    const { pp, caption, mentions } = await generarBienvenida({ conn, userId, groupMetadata, chat })
 
     const welcomeImg =
       'https://api.ryuu-dev.offc.my.id/tools/WelcomeLeave?' +
-      `title=Bienvenido+${encodeURIComponent(userId.split('@')[0])}` +
+      `title=Bienvenido+${encodeURIComponent(username)}` +
       `&desc=${encodeURIComponent(groupMetadata.subject)}` +
       `&profile=${encodeURIComponent(pp)}` +
-      `&background=${encodeURIComponent(welcomeBannerData.data.backgroundUrl)}`;
+      `&background=${encodeURIComponent(welcomeBannerData.data.backgroundUrl)}`
 
     await conn.sendMessage(
       m.chat,
@@ -183,38 +185,33 @@ END:VCARD`
           retailerId: 777,
           productImageCount: 1
         },
-
         businessOwnerJid: '0@s.whatsapp.net',
-
         caption,
         footer: `© ${packname} · Welcome`,
-
         interactiveButtons: [
           {
             name: 'quick_reply',
             buttonParamsJson: JSON.stringify({
-              display_text: '👻 Menú',
+              display_text: '⚡ Menú',
               id: '#menu'
             })
           }
         ],
-
         mentions
       },
       { quoted: fkontak }
-    );
+    )
   }
 
   if (chat.welcome && (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE)) {
-
-    const { pp, caption, mentions } = await generarDespedida({ conn, userId, groupMetadata, chat });
+    const { pp, caption, mentions } = await generarDespedida({ conn, userId, groupMetadata, chat })
 
     const goodbyeImg =
       'https://api.ryuu-dev.offc.my.id/tools/WelcomeLeave?' +
-      `title=Adios+${encodeURIComponent(userId.split('@')[0])}` +
+      `title=Adios+${encodeURIComponent(username)}` +
       `&desc=${encodeURIComponent(groupMetadata.subject)}` +
       `&profile=${encodeURIComponent(pp)}` +
-      `&background=${encodeURIComponent(welcomeBannerData.data.backgroundUrl)}`;
+      `&background=${encodeURIComponent(welcomeBannerData.data.backgroundUrl)}`
 
     await conn.sendMessage(
       m.chat,
@@ -222,34 +219,30 @@ END:VCARD`
         product: {
           productImage: { url: goodbyeImg },
           productId: 'shadow-goodbye',
-          title: '─ Ａ Ｄ Ｉ Ó S ─ 👋🏻',
+          title: '─ Ａ Ｄ Ｉ Ó Ｓ ─ 👋🏻',
           currencyCode: 'USD',
           priceAmount1000: '0',
           retailerId: 777,
           productImageCount: 1
         },
-
         businessOwnerJid: '0@s.whatsapp.net',
-
         caption,
         footer: `© ${packname} · Goodbye`,
-
         interactiveButtons: [
           {
             name: 'quick_reply',
             buttonParamsJson: JSON.stringify({
-              display_text: '👻 Menú',
+              display_text: '⚡ Menú',
               id: '#menu'
             })
           }
         ],
-
         mentions
       },
       { quoted: fkontak }
-    );
+    )
   }
-};
+}
 
-export { generarBienvenida, generarDespedida };
-export default handler;
+export { generarBienvenida, generarDespedida }
+export default handler

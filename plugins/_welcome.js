@@ -1,5 +1,4 @@
 import fs from 'fs'
-import fetch from 'node-fetch'
 import { WAMessageStubType } from '@whiskeysockets/baileys'
 
 const newsletterJid = '120363423523597117@newsletter';
@@ -15,37 +14,35 @@ const iconos = [
 
 const getRandomIcono = () => iconos[Math.floor(Math.random() * iconos.length)];
 
+// Configuración de imagen basada en tu JSON
+const welcomeBannerData = {
+  "backgroundUrl": "https://files.catbox.moe/gbp5x3.jpg",
+  "profileUrl": "https://unavatar.io/github/yosue891",
+  "borderColor": "#00ffff"
+};
+
 async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
   const username = `@${userId.split('@')[0]}`;
   const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric' });
   const groupSize = groupMetadata.participants.length + 1;
   const desc = groupMetadata.desc?.toString() || 'Sin descripción';
 
-  let caption;
-  if (chat.welcomeText) {
-    caption = chat.welcomeText
-      .replace(/@user/g, username)
-      .replace(/@subject/g, groupMetadata.subject)
-      .replace(/@desc/g, desc);
-  } else {
-    const defaultWelcomeMessage = `╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐈𝐍𝐈𝐂𝐈𝐎 」─╮\n\n@user ha sido convocado por las sombras...\nBienvenid@ al dominio secreto de *@subject*.\n\n╰─「 🌌 𝐈𝐍𝐅𝐎 𝐃𝐄𝐋 𝐆𝐑𝐔𝐏𝐎 」─╯\n🧿 Miembros: ${groupSize}\n📅 Fecha: ${fecha}\n📜 Descripción:\n${desc}`;
-    caption = defaultWelcomeMessage.replace(/@user/g, username).replace(/@subject/g, groupMetadata.subject);
-  }
+  let caption = (chat.welcomeText || `╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐈𝐍𝐈𝐂𝐈𝐎 」─╮\n\n@user ha sido convocado...\nBienvenid@ a *@subject*.\n\n🧿 Miembros: ${groupSize}\n📅 Fecha: ${fecha}`)
+    .replace(/@user/g, username)
+    .replace(/@subject/g, groupMetadata.subject)
+    .replace(/@desc/g, desc);
+
   return { caption, mentions: [userId] };
 }
 
 async function generarDespedida({ conn, userId, groupMetadata, chat }) {
   const username = `@${userId.split('@')[0]}`;
-  const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric' });
   const groupSize = groupMetadata.participants.length - 1;
 
-  let caption;
-  if (chat.byeText) {
-    caption = chat.byeText.replace(/@user/g, username).replace(/@subject/g, groupMetadata.subject);
-  } else {
-    const defaultByeMessage = `╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐑𝐄𝐓𝐈𝐑𝐀𝐃𝐀 」─╮\n\n@user ha abandonado el círculo de las sombras.\n\n╰─「 🌌 𝐄𝐒𝐓𝐀𝐃𝐎 𝐀𝐂𝐓𝐔𝐀𝐋 」─╯\n📉 Miembros: ${groupSize}\n📅 Fecha: ${fecha}`;
-    caption = defaultByeMessage.replace(/@user/g, username).replace(/@subject/g, groupMetadata.subject);
-  }
+  let caption = (chat.byeText || `╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐑𝐄𝐓𝐈𝐑𝐀𝐃𝐀 」─╮\n\n@user ha abandonado las sombras.\n\n📉 Miembros: ${groupSize}`)
+    .replace(/@user/g, username)
+    .replace(/@subject/g, groupMetadata.subject);
+
   return { caption, mentions: [userId] };
 }
 
@@ -58,50 +55,32 @@ handler.before = async function (m, { conn, groupMetadata }) {
   if (!chat || !chat.welcome) return !0;
 
   const userId = m.messageStubParameters[0];
-  const userPP = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://unavatar.io/github/yosue891');
-
-  // Construimos la URL de la API usando el JSON que proporcionaste
-  const jsonParam = encodeURIComponent(JSON.stringify({
-    "backgroundUrl": "https://files.catbox.moe/gbp5x3.jpg",
-    "profileUrl": userPP,
-    "profileSize": 200,
-    "profileX": 500,
-    "profileY": 200,
-    "borderColor": "#00ffff",
-    "borderWidth": 8,
-    "texts": [
-      { "text": "Bienvenido", "x": 500, "y": 350, "size": 50, "color": "#ffffff", "font": "Arial", "bold": true, "align": "center" },
-      { "text": "Disfruta tu estancia", "x": 500, "y": 420, "size": 30, "color": "#ffffff", "font": "Arial", "bold": false, "align": "center" }
-    ]
-  }));
-
-  // Usamos una API que renderiza JSON a imagen (puedes cambiar 'Adonix' por tu endpoint real)
-  const finalImageUrl = `https://api.Adonix.com/render?json=${jsonParam}`;
 
   const contextInfo = {
     isForwarded: true,
     forwardingScore: 999,
     forwardedNewsletterMessageInfo: { newsletterJid, newsletterName, serverMessageId: -1 },
     externalAdReply: {
-      title: packname,
-      body: 'Organización Shadow Garden',
-      thumbnailUrl: getRandomIcono(),
+      title: 'YOSOYYO - Banner Generator',
+      body: 'Shadow Garden Project',
+      thumbnailUrl: welcomeBannerData.profileUrl,
       sourceUrl: global.redes,
       mediaType: 1,
-      renderLargerThumbnail: false
+      renderLargerThumbnail: true
     }
   };
 
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
     const { caption, mentions } = await generarBienvenida({ conn, userId, groupMetadata, chat });
     contextInfo.mentionedJid = mentions;
-    await conn.sendMessage(m.chat, { image: { url: finalImageUrl }, caption, contextInfo }, { quoted: null });
+    // Usamos la URL directa del fondo para que WhatsApp no rechace el mensaje
+    await conn.sendMessage(m.chat, { image: { url: welcomeBannerData.backgroundUrl }, caption, contextInfo }, { quoted: null });
   }
 
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE) {
     const { caption, mentions } = await generarDespedida({ conn, userId, groupMetadata, chat });
     contextInfo.mentionedJid = mentions;
-    await conn.sendMessage(m.chat, { image: { url: finalImageUrl }, caption, contextInfo }, { quoted: null });
+    await conn.sendMessage(m.chat, { image: { url: welcomeBannerData.backgroundUrl }, caption, contextInfo }, { quoted: null });
   }
 };
 

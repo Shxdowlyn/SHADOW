@@ -12,7 +12,6 @@ const iconos = [
   'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165128396-b5e568.jpg',
 ];
 
-// 🔥 BLOQUE QUE PEDISTE AÑADIR — TAL CUAL 🔥
 const welcomeBannerData = {
   "status": 200,
   "api_name": "YOSOYYO",
@@ -53,7 +52,6 @@ const welcomeBannerData = {
     ]
   }
 };
-// 🔥 FIN DEL BLOQUE AÑADIDO 🔥
 
 const getRandomIcono = () => iconos[Math.floor(Math.random() * iconos.length)];
 
@@ -142,7 +140,6 @@ handler.before = async function (m, { conn, participants, groupMetadata}) {
 
   const userId = m.messageStubParameters[0];
 
-  // CONTACTO FAKE
   const fkontak = {
     key: {
       participants: '0@s.whatsapp.net',
@@ -163,7 +160,6 @@ END:VCARD`
     }
   };
 
-  // 📌 WELCOME
   if (chat.welcome && m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
 
     const { pp, caption, mentions } = await generarBienvenida({ conn, userId, groupMetadata, chat });
@@ -197,7 +193,7 @@ END:VCARD`
           {
             name: 'quick_reply',
             buttonParamsJson: JSON.stringify({
-              display_text: '⚡ Menú',
+              display_text: '👻 Menú',
               id: '#menu'
             })
           }
@@ -209,7 +205,6 @@ END:VCARD`
     );
   }
 
-  // 📌 GOODBYE
   if (chat.welcome && (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE)) {
 
     const { pp, caption, mentions } = await generarDespedida({ conn, userId, groupMetadata, chat });
@@ -243,7 +238,7 @@ END:VCARD`
           {
             name: 'quick_reply',
             buttonParamsJson: JSON.stringify({
-              display_text: '⚡ Menú',
+              display_text: '👻 Menú',
               id: '#menu'
             })
           }

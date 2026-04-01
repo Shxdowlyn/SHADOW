@@ -131,62 +131,130 @@ Las sombras no olvidan, pero tampoco lloran.
 
 let handler = m => m;
 
-handler.before = async function (m, { conn, participants, groupMetadata}) {if (!m.messageStubType ||!m.isGroup) return!0;
+handler.before = async function (m, { conn, participants, groupMetadata}) {
+  if (!m.messageStubType || !m.isGroup) return !0;
 
   const chat = global.db.data.chats[m.chat];
-  if (!chat) return!0;
+  if (!chat) return !0;
 
   const primaryBot = chat.botPrimario;
-  if (primaryBot && conn.user.jid!== primaryBot) return!0;
+  if (primaryBot && conn.user.jid !== primaryBot) return !0;
 
   const userId = m.messageStubParameters[0];
 
+  // CONTACTO FAKE
+  const fkontak = {
+    key: {
+      participants: '0@s.whatsapp.net',
+      remoteJid: 'status@broadcast',
+      fromMe: false,
+      id: 'ShadowBot'
+    },
+    message: {
+      contactMessage: {
+        displayName: packname,
+        vcard: `BEGIN:VCARD
+VERSION:3.0
+FN:${packname}
+ORG:${packname};
+TEL;type=CELL;type=VOICE;waid=0:+0
+END:VCARD`
+      }
+    }
+  };
+
+  // 📌 WELCOME
   if (chat.welcome && m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
-    const { pp, caption, mentions} = await generarBienvenida({ conn, userId, groupMetadata, chat});
-    const contextInfo = {
-      mentionedJid: mentions,
-      isForwarded: true,
-      forwardingScore: 999,
-      forwardedNewsletterMessageInfo: {
-        newsletterJid,
-        newsletterName,
-        serverMessageId: -1
-},
-      externalAdReply: {
-        title: packname,
-        body: '🌌 𝐒𝐡𝐚𝐝𝐨𝐰 𝐆𝐚𝐫𝐝𝐞𝐧 𝐭𝐞 𝐝𝐚 𝐥𝐚 𝐛𝐢𝐞𝐧𝐯𝐞𝐧𝐢𝐝𝐚...',
-        thumbnailUrl: getRandomIcono(),
-        sourceUrl: global.redes,
-        mediaType: 1,
-        renderLargerThumbnail: false
-}
-};
-    await conn.sendMessage(m.chat, { image: { url: pp}, caption, contextInfo}, { quoted: null});
-}
 
+    const { pp, caption, mentions } = await generarBienvenida({ conn, userId, groupMetadata, chat });
+
+    const welcomeImg =
+      'https://api.ryuu-dev.offc.my.id/tools/WelcomeLeave?' +
+      `title=Bienvenido+${encodeURIComponent(userId.split('@')[0])}` +
+      `&desc=${encodeURIComponent(groupMetadata.subject)}` +
+      `&profile=${encodeURIComponent(pp)}` +
+      `&background=${encodeURIComponent(welcomeBannerData.data.backgroundUrl)}`;
+
+    await conn.sendMessage(
+      m.chat,
+      {
+        product: {
+          productImage: { url: welcomeImg },
+          productId: 'shadow-welcome',
+          title: '─ W E L C O M E ─ 🌌',
+          currencyCode: 'USD',
+          priceAmount1000: '0',
+          retailerId: 777,
+          productImageCount: 1
+        },
+
+        businessOwnerJid: '0@s.whatsapp.net',
+
+        caption,
+        footer: `© ${packname} · Welcome`,
+
+        interactiveButtons: [
+          {
+            name: 'quick_reply',
+            buttonParamsJson: JSON.stringify({
+              display_text: '⚡ Menú',
+              id: '#menu'
+            })
+          }
+        ],
+
+        mentions
+      },
+      { quoted: fkontak }
+    );
+  }
+
+  // 📌 GOODBYE
   if (chat.welcome && (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE)) {
-    const { pp, caption, mentions} = await generarDespedida({ conn, userId, groupMetadata, chat});
-    const contextInfo = {
-      mentionedJid: mentions,
-      isForwarded: true,
-      forwardingScore: 999,
-      forwardedNewsletterMessageInfo: {
-        newsletterJid,
-        newsletterName,
-        serverMessageId: -1
-},
-      externalAdReply: {
-        title: packname,
-        body: '🌌 𝐋𝐚𝐬 𝐬𝐨𝐦𝐛𝐫𝐚𝐬 𝐬𝐞 𝐜𝐢𝐞𝐫𝐫𝐚𝐧 𝐬𝐢𝐧 𝐫𝐞𝐦𝐨𝐫𝐬𝐨...',
-        thumbnailUrl: getRandomIcono(),
-        sourceUrl: global.redes,
-        mediaType: 1,
-        renderLargerThumbnail: false
-}
-};
-    await conn.sendMessage(m.chat, { image: { url: pp}, caption, contextInfo}, { quoted: null});
-}
+
+    const { pp, caption, mentions } = await generarDespedida({ conn, userId, groupMetadata, chat });
+
+    const goodbyeImg =
+      'https://api.ryuu-dev.offc.my.id/tools/WelcomeLeave?' +
+      `title=Adios+${encodeURIComponent(userId.split('@')[0])}` +
+      `&desc=${encodeURIComponent(groupMetadata.subject)}` +
+      `&profile=${encodeURIComponent(pp)}` +
+      `&background=${encodeURIComponent(welcomeBannerData.data.backgroundUrl)}`;
+
+    await conn.sendMessage(
+      m.chat,
+      {
+        product: {
+          productImage: { url: goodbyeImg },
+          productId: 'shadow-goodbye',
+          title: '─ Ａ Ｄ Ｉ Ó S ─ 👋🏻',
+          currencyCode: 'USD',
+          priceAmount1000: '0',
+          retailerId: 777,
+          productImageCount: 1
+        },
+
+        businessOwnerJid: '0@s.whatsapp.net',
+
+        caption,
+        footer: `© ${packname} · Goodbye`,
+
+        interactiveButtons: [
+          {
+            name: 'quick_reply',
+            buttonParamsJson: JSON.stringify({
+              display_text: '⚡ Menú',
+              id: '#menu'
+            })
+          }
+        ],
+
+        mentions
+      },
+      { quoted: fkontak }
+    );
+  }
 };
 
-export { generarBienvenida, generarDespedida};
+export { generarBienvenida, generarDespedida };
 export default handler;

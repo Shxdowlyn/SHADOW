@@ -204,48 +204,4 @@ END:VCARD`
     )
   }
 
-  if (chat.welcome && (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE)) {
-    const { pp, caption, mentions, username } = await generarDespedida({ conn, userId, groupMetadata, chat })
-
-    welcomeBannerData.data.texts[0].text = `Adiós ${username}`
-
-    const goodbyeImg =
-      'https://api.ryuu-dev.offc.my.id/tools/WelcomeLeave?' +
-      `title=${encodeURIComponent(welcomeBannerData.data.texts[0].text)}` +
-      `&desc=${encodeURIComponent(groupMetadata.subject)}` +
-      `&profile=${encodeURIComponent(pp)}` +
-      `&background=${encodeURIComponent(welcomeBannerData.data.backgroundUrl)}`
-
-    await conn.sendMessage(
-      m.chat,
-      {
-        product: {
-          productImage: { url: goodbyeImg },
-          productId: 'shadow-goodbye',
-          title: '─ Ａ Ｄ Ｉ Ó Ｓ ─ 👋🏻',
-          currencyCode: 'USD',
-          priceAmount1000: '0',
-          retailerId: 777,
-          productImageCount: 1
-        },
-        businessOwnerJid: '0@s.whatsapp.net',
-        caption,
-        footer: `© ${packname} · Goodbye`,
-        interactiveButtons: [
-          {
-            name: 'quick_reply',
-            buttonParamsJson: JSON.stringify({
-              display_text: '⚡ Menú',
-              id: '#menu'
-            })
-          }
-        ],
-        mentions
-      },
-      { quoted: fkontak }
-    )
-  }
-}
-
-export { generarBienvenida, generarDespedida }
-export default handler
+  if (chat.welcome && (m.messageStubType == WAMessage

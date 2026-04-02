@@ -13,47 +13,24 @@ const iconos = [
 ]
 
 const welcomeBannerData = {
-  "status": 200,
-  "api_name": "YOSOYYO",
-  "tool": "welcome_banner_generator",
-  "message": "Imagen generada con éxito.",
-  "creator": "YO SOY YO",
-  "data": {
-    "width": 1000,
-    "height": 500,
-    "backgroundUrl": "https://files.catbox.moe/gbp5x3.jpg",
-    "profileUrl": "https://unavatar.io/github/yosue891",
-    "profileSize": 200,
-    "profileX": 500,
-    "profileY": 200,
-    "borderColor": "#00ffff",
-    "borderWidth": 8,
-    "texts": [
-      {
-        "text": "Bienvenido @user",
-        "x": 500,
-        "y": 350,
-        "size": 50,
-        "color": "#ffffff",
-        "font": "Arial",
-        "bold": true,
-        "align": "center"
-      },
-      {
-        "text": "Disfruta tu estancia",
-        "x": 500,
-        "y": 420,
-        "size": 30,
-        "color": "#ffffff",
-        "font": "Arial",
-        "bold": false,
-        "align": "center"
-      }
-    ]
+  status: 200,
+  api_name: "YOSOYYO",
+  tool: "welcome_banner_generator",
+  message: "Imagen generada con éxito.",
+  creator: "YO SOY YO",
+  data: {
+    width: 1000,
+    height: 500,
+    backgroundUrl: "https://files.catbox.moe/gbp5x3.jpg",
+    profileUrl: "https://unavatar.io/github/yosue891",
+    profileSize: 200,
+    profileX: 500,
+    profileY: 200,
+    borderColor: "#00ffff",
+    borderWidth: 8,
+    texts: []
   }
 }
-
-const getRandomIcono = () => iconos[Math.floor(Math.random() * iconos.length)]
 
 function estilizarNombre(nombre) {
   return `『 ${nombre} 』`
@@ -61,8 +38,15 @@ function estilizarNombre(nombre) {
 
 async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
   const username = `@${userId.split('@')[0]}`
-  const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg')
-  const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric' })
+  const pp = await conn.profilePictureUrl(userId, 'image').catch(() =>
+    'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg'
+  )
+  const fecha = new Date().toLocaleDateString("es-ES", {
+    timeZone: "America/Santo_Domingo",
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
   const groupSize = groupMetadata.participants.length + 1
   const desc = groupMetadata.desc?.toString() || 'Sin descripción'
 
@@ -73,7 +57,7 @@ async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
       .replace(/@subject/g, groupMetadata.subject)
       .replace(/@desc/g, desc)
   } else {
-    const defaultWelcomeMessage = `╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐈𝐍𝐈𝐂𝐈𝐎 」─╮
+    caption = `╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐈𝐍𝐈𝐂𝐈𝐎 」─╮
 
 @user ha sido convocado por las sombras...
 Bienvenid@ al dominio secreto de *@subject*.
@@ -88,8 +72,6 @@ Tu poder será forjado en silencio. Tu lealtad, puesta a prueba.
 ${desc}
 
 > Usa *#setwelcome* para personalizar este mensaje.`
-
-    caption = defaultWelcomeMessage
       .replace(/@user/g, username)
       .replace(/@subject/g, groupMetadata.subject)
   }
@@ -99,8 +81,15 @@ ${desc}
 
 async function generarDespedida({ conn, userId, groupMetadata, chat }) {
   const username = `@${userId.split('@')[0]}`
-  const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165081580-660d44.jpg')
-  const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric' })
+  const pp = await conn.profilePictureUrl(userId, 'image').catch(() =>
+    'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165081580-660d44.jpg'
+  )
+  const fecha = new Date().toLocaleDateString("es-ES", {
+    timeZone: "America/Santo_Domingo",
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
   const groupSize = groupMetadata.participants.length - 1
 
   let caption
@@ -109,7 +98,7 @@ async function generarDespedida({ conn, userId, groupMetadata, chat }) {
       .replace(/@user/g, username)
       .replace(/@subject/g, groupMetadata.subject)
   } else {
-    const defaultByeMessage = `╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐑𝐄𝐓𝐈𝐑𝐀𝐃𝐀 」─╮
+    caption = `╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐑𝐄𝐓𝐈𝐑𝐀𝐃𝐀 」─╮
 
 @user ha abandonado el círculo de las sombras.
 Su presencia se desvanece... como todo lo que no deja huella.
@@ -124,8 +113,6 @@ Las sombras no olvidan, pero tampoco lloran.
 📅 Fecha: ${fecha}
 
 > Usa *#setbye* para personalizar este mensaje.`
-
-    caption = defaultByeMessage
       .replace(/@user/g, username)
       .replace(/@subject/g, groupMetadata.subject)
   }
@@ -135,7 +122,7 @@ Las sombras no olvidan, pero tampoco lloran.
 
 let handler = m => m
 
-handler.before = async function (m, { conn, participants, groupMetadata }) {
+handler.before = async function (m, { conn, groupMetadata }) {
   if (!m.messageStubType || !m.isGroup) return !0
 
   const chat = global.db.data.chats[m.chat]
@@ -170,9 +157,31 @@ END:VCARD`
   const styledName = estilizarNombre(realName)
 
   if (chat.welcome && m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
+
     const { pp, caption, mentions } = await generarBienvenida({ conn, userId, groupMetadata, chat })
 
-    welcomeBannerData.data.texts[0].text = `Bienvenido ${styledName}`
+    welcomeBannerData.data.texts = [
+      {
+        text: `Bienvenido ${styledName}`,
+        x: 500,
+        y: 350,
+        size: 50,
+        color: "#ffffff",
+        font: "Arial",
+        bold: true,
+        align: "center"
+      },
+      {
+        text: "Disfruta tu estancia",
+        x: 500,
+        y: 420,
+        size: 30,
+        color: "#ffffff",
+        font: "Arial",
+        bold: false,
+        align: "center"
+      }
+    ]
 
     const welcomeImg =
       'https://api.ryuu-dev.offc.my.id/tools/WelcomeLeave?' +
@@ -212,9 +221,31 @@ END:VCARD`
   }
 
   if (chat.welcome && (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE)) {
+
     const { pp, caption, mentions } = await generarDespedida({ conn, userId, groupMetadata, chat })
 
-    welcomeBannerData.data.texts[0].text = `Adiós ${styledName}`
+    welcomeBannerData.data.texts = [
+      {
+        text: `ADIOS ${styledName} 👋`,
+        x: 500,
+        y: 350,
+        size: 50,
+        color: "#ffffff",
+        font: "Arial",
+        bold: true,
+        align: "center"
+      },
+      {
+        text: "SE FUE NA SOMBRA...",
+        x: 500,
+        y: 420,
+        size: 30,
+        color: "#ffffff",
+        font: "Arial",
+        bold: false,
+        align: "center"
+      }
+    ]
 
     const goodbyeImg =
       'https://api.ryuu-dev.offc.my.id/tools/WelcomeLeave?' +

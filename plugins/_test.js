@@ -17,9 +17,8 @@ const testYtmp3Full = async (m, { conn, text }) => {
 
     const res = await fetch(endpoint, { method: 'GET', redirect: 'follow' }).then(r => r.text());
     console.log('[INFO] Respuesta API completa recibida');
-    console.log(res); // TODO en consola
+    console.log(res); 
 
-    // Si es muy largo lo mandamos como archivo
     if (res.length > 4000) {
       console.log('[INFO] Contenido demasiado largo, enviando como archivo');
       await conn.sendMessage(m.chat, {

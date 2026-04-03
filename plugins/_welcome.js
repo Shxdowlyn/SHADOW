@@ -24,8 +24,8 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const userId = m.messageStubParameters[0]
   const userJid = userId.includes('@') ? userId : `${userId}@s.whatsapp.net`
   
-  const name = conn.getName(userJid)
-  const styledName = (name && !name.includes('@')) ? name : userId.split('@')[0]
+  const pushName = conn.getName(userJid)
+  const styledName = (pushName && !pushName.includes('@')) ? pushName : userId.split('@')[0]
   
   const pp = await conn.profilePictureUrl(userJid, 'image').catch(() => 'https://files.catbox.moe/gbp5x3.jpg')
   const groupName = groupMetadata.subject

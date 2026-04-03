@@ -1,39 +1,3 @@
-import fs from 'fs'
-import { WAMessageStubType } from '@whiskeysockets/baileys'
-
-const newsletterJid = '120363423523597117@newsletter';
-const newsletterName = '👑 SHADOW-BOT-MD| ᴄʜᴀɴɴᴇʟ-ʙᴏᴛ 🌌';
-const packname = 'shadow-BOT-MD'
-
-const iconos = [
-  'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165065152-94d843.jpg',
-  'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165081580-660d44.jpg',
-  'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165160074-de0e81.jpg',
-  'https://raw.githubusercontent.com/UploadsAdonix/archivos/main/1763165128396-b5e568.jpg',
-];
-
-const getRandomIcono = () => iconos[Math.floor(Math.random() * iconos.length)];
-
-async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
-  const username = `@${userId.split('@')[0]}`;
-  const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg');
-  const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Santo_Domingo", day: 'numeric', month: 'long', year: 'numeric' });
-  const groupSize = groupMetadata.participants.length + 1;
-  const desc = groupMetadata.desc?.toString() || 'Sin descripción';
-
-  const banner = {
-    "status": 200,
-    "api_name": "YOSOYYO",
-    "tool": "welcome_banner_generator",
-    "message": "Imagen generada con éxito.",
-    "creator": "YO SOY YO",
-    "data": {
-      "width": 1000,
-      "height": 500,
-      "backgroundUrl": "https://files.catbox.moe/gbp5x3.jpg",
-      "profileUrl": "https://unavatar.io/github/yosue891",
-      "profileSize": 200,
-      "profileX": 500,
       "profileY": 200,
       "borderColor": "#00ffff",
       "borderWidth": 8,

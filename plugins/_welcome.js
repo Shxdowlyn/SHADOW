@@ -20,24 +20,14 @@ function resolvePhoneJid(raw = '') {
 }
 
 function resolveUserJid(rawId, participants, groupId) {
-  const found = participants.find(p =>
-    p.id === rawId || p.lid === rawId || p.jid === rawId
-  )
-
+  const found = participants.find(p => p.id === rawId || p.lid === rawId || p.jid === rawId)
   if (found) {
     const phoneSource = found.phoneNumber || found.pn || found.jid || ''
-    if (phoneSource && !phoneSource.endsWith('@lid')) {
-      return resolvePhoneJid(phoneSource)
-    }
+    if (phoneSource && !phoneSource.endsWith('@lid')) return resolvePhoneJid(phoneSource)
   }
-
   const cached = participantCache[groupId]?.[rawId]
   if (cached) return cached
-
-  if (!rawId.endsWith('@lid')) {
-    return rawId.includes('@') ? rawId : `${rawId}@s.whatsapp.net`
-  }
-
+  if (!rawId.endsWith('@lid')) return rawId.includes('@') ? rawId : `${rawId}@s.whatsapp.net`
   return rawId
 }
 
@@ -57,9 +47,7 @@ let handler = m => m
 handler.before = async function (m, { conn, groupMetadata }) {
   if (!m.messageStubType || !m.isGroup) return !0
 
-  if (groupMetadata?.participants?.length) {
-    cacheParticipants(m.chat, groupMetadata.participants)
-  }
+  if (groupMetadata?.participants?.length) cacheParticipants(m.chat, groupMetadata.participants)
 
   const chat = global.db?.data?.chats?.[m.chat]
   if (!chat || !chat.welcome) return !0
@@ -67,10 +55,7 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const rawId = m.messageStubParameters[0]
   const userJid = resolveUserJid(rawId, groupMetadata.participants, m.chat)
 
-  if (userJid.endsWith('@lid')) {
-    console.warn('[welcome] No se pudo resolver JID real para:', rawId)
-    return !0
-  }
+  if (userJid.endsWith('@lid')) return !0
 
   const userTag = userJid.split('@')[0]
   const userName = conn.getName(userJid) || userTag
@@ -80,50 +65,97 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const fecha = new Date().toLocaleDateString('es-ES', { timeZone: 'America/Santo_Domingo', day: 'numeric', month: 'long', year: 'numeric' })
   const desc = groupMetadata.desc?.toString() || 'Sin descripción'
 
+  // --- CONFIGURACIÓN DEL CONTACTO FALSO (FKONTAK) ---
+  const fkontak = {
+    key: { participants: '0@s.whatsapp.net', remoteJid: 'status@broadcast', fromMe: false, id: 'ShadowWelcome' },
+    message: {
+      contactMessage: {
+        displayName: userName,
+        vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:${userName}\nTEL;type=CELL;type=VOICE;waid=${userTag}:${userTag}\nEND:VCARD`
+      }
+    }
+  }
+
+  // --- LÓGICA DE BIENVENIDA ---
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
-    const welcomeApi = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Bienvenido+a+${encodeURIComponent(groupName)}&text3=Miembro+${groupSize}&avatar=${encodeURIComponent(pp)}`
+    const welcomeImg = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Bienvenido+a+${encodeURIComponent(groupName)}&text3=Miembro+${groupSize}&avatar=${encodeURIComponent(pp)}`
 
     const caption = chat.welcomeText
       ? chat.welcomeText.replace(/@subject/g, groupName).replace(/@desc/g, desc).replace(/@user/g, `@${userTag}`)
-      : `╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐈𝐍𝐈𝐂𝐈𝐎 」─╮\n\n${userName} ha sido convocado por las sombras...\nBienvenid@ al dominio secreto de *${groupName}*.\n\nTu llegada no es casual. Cada paso será observado.\nTu poder será forjado en silencio. Tu lealtad, puesta a prueba.\n\n╰─「 🌌 𝐈𝐍𝐅𝐎 𝐃𝐄𝐋 𝐆𝐑𝐔𝐏𝐎 」─╯\n🧿 Miembros: ${groupSize}\n📅 Fecha: ${fecha}\n📜 Descripción:\n@user\n\n> Usa *#setwelcome* para personalizar este mensaje.`
+      : `╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍 」─╮\n\n${userName} ha sido convocado...\nBienvenid@ a *${groupName}*.\n\n🧿 Miembros: ${groupSize}\n📅 Fecha: ${fecha}\n\n> Usa *#setwelcome* para personalizar.`
 
     await conn.sendMessage(m.chat, {
-      image: { url: welcomeApi },
-      caption,
+      product: {
+        productImage: { url: welcomeImg },
+        productId: 'welcome-001',
+        title: '─ W E L C O M E ─🥷🏻',
+        currencyCode: 'USD',
+        priceAmount1000: '0',
+        retailerId: 1677,
+        productImageCount: 1
+      },
+      businessOwnerJid: '0@s.whatsapp.net',
+      caption: caption,
+      footer: `© ${packname} · Welcome`,
+      interactiveButtons: [
+        {
+          name: 'quick_reply',
+          buttonParamsJson: JSON.stringify({ display_text: '👤 Registrarme', id: `#reg ${userName}.18` })
+        }
+      ],
       mentions: [userJid],
       contextInfo: {
         externalAdReply: {
           title: 'Welcome to Shadow Garden',
-          body: packname,
+          body: groupName,
           thumbnailUrl: getRandomIcono(),
           mediaType: 1,
-          showAdAttribution: true
+          showAdAttribution: true,
+          sourceUrl: 'https://wa.me/584242773183'
         }
       }
-    }, { quoted: null })
+    }, { quoted: fkontak })
   }
 
+  // --- LÓGICA DE DESPEDIDA ---
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE) {
-    const goodbyeApi = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Se+fue+de+${encodeURIComponent(groupName)}&text3=Adiós+Sombra&avatar=${encodeURIComponent(pp)}`
+    const goodbyeImg = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Se+fue+de+${encodeURIComponent(groupName)}&text3=Adiós+Sombra&avatar=${encodeURIComponent(pp)}`
 
     const caption = chat.byeText
       ? chat.byeText.replace(/@subject/g, groupName).replace(/@user/g, `@${userTag}`)
-      : `╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐑𝐄𝐓𝐈𝐑𝐀𝐃𝐀 」─╮\n\n${userName} ha abandonado el círculo de las sombras.\nSu presencia se desvanece... como todo lo que no deja huella.\n\nGrupo: *${groupName}*\n\nQue su memoria permanezca en silencio.\nLas sombras no olvidan, pero tampoco lloran.\n\n╰─「 🌌 𝐄𝐒𝐓𝐀𝐃𝐎 𝐀𝐂𝐓𝐔𝐀𝐋 」─╯\n📉 Miembros: ${groupSize}\n📅 Fecha: ${fecha}\n📜 Descripción:\n@user\n\n> Usa *#setbye* para personalizar este mensaje.`
+      : `╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍 」─╮\n\n${userName} abandonó el círculo.\nSu presencia se desvanece...\n\n📉 Miembros: ${groupSize}\n📅 Fecha: ${fecha}\n\n> Usa *#setbye* para personalizar.`
 
     await conn.sendMessage(m.chat, {
-      image: { url: goodbyeApi },
-      caption,
+      product: {
+        productImage: { url: goodbyeImg },
+        productId: 'goodbye-001',
+        title: '─ Ａ Ｄ Ｉ Ｏ Ｓ ─👋🏻',
+        currencyCode: 'USD',
+        priceAmount1000: '0',
+        retailerId: 1677,
+        productImageCount: 1
+      },
+      businessOwnerJid: '0@s.whatsapp.net',
+      caption: caption,
+      footer: `© ${packname} · Goodbye`,
+      interactiveButtons: [
+        {
+          name: 'quick_reply',
+          buttonParamsJson: JSON.stringify({ display_text: '👤 Registrarme', id: `#reg ${userName}.18` })
+        }
+      ],
       mentions: [userJid],
       contextInfo: {
         externalAdReply: {
           title: 'Farewell from Shadow Garden',
-          body: packname,
+          body: groupName,
           thumbnailUrl: getRandomIcono(),
           mediaType: 1,
-          showAdAttribution: true
+          showAdAttribution: true,
+          sourceUrl: 'https://wa.me/584242773183'
         }
       }
-    }, { quoted: null })
+    }, { quoted: fkontak })
   }
 }
 

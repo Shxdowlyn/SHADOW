@@ -1,5 +1,6 @@
 import speed from 'performance-now'
 import fetch from 'node-fetch'
+const { generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default
 
 let handler = async (m, { conn }) => {
   let timestamp = speed()
@@ -11,27 +12,18 @@ let handler = async (m, { conn }) => {
   let { key } = await conn.reply(m.chat, '❐ 𝐂𝐚𝐥𝐜𝐮𝐥𝐚𝐧𝐝𝐨 𝐏𝐢𝐧𝐠... 🚀', m)
 
   try {
-    // 2. Miniatura pequeña para el quoted (URL que pediste)
+    // 2. Miniatura pequeña para el quoted
     const res = await fetch('https://i.ibb.co/ZRLSTYx7/b0243290e236.jpg')
     const thumb = Buffer.from(await res.arrayBuffer())
 
-    // 3. Estructura shadow_xyz para el quoted (citado)
+    // 3. Estructura shadow_xyz para el quoted
     const shadow_xyz = {
-      key: {
-        remoteJid: 'status@broadcast',
-        fromMe: false,
-        id: 'ShadowCatalogPing',
-        participant: '0@s.whatsapp.net'
-      },
+      key: { remoteJid: 'status@broadcast', fromMe: false, id: 'ShadowPing', participant: '0@s.whatsapp.net' },
       message: {
         productMessage: {
           product: {
-            productImage: {
-              mimetype: 'image/jpeg',
-              jpegThumbnail: thumb
-            },
+            productImage: { mimetype: 'image/jpeg', jpegThumbnail: thumb },
             title: '𝐒𝐡𝐚𝐝𝐨𝐰 𝐆𝐚𝐫𝐝𝐞𝐧 • 𝐏𝐢𝐧𝐠',
-            description: 'Shadow team system',
             currencyCode: 'USD',
             priceAmount1000: '0',
             retailerId: 'ShadowCore',
@@ -63,34 +55,35 @@ let handler = async (m, { conn }) => {
     // 4. Borramos el de carga
     await conn.sendMessage(m.chat, { delete: key })
 
-    // 5. ENVIAMOS COMO PRODUCT MESSAGE REAL (ESTILO REGISTRO)
-    await conn.sendMessage(m.chat, {
-      product: {
-        productImage: { url: 'https://files.catbox.moe/yfdd3r.jpg' },
-        productId: '999999999999999',
-        title: '✨ 𝐏𝐈𝐍𝐆 - 𝐒𝐇𝐀𝐃𝐎𝐖 𝐁𝐎𝐓 ✨',
-        description: 'Latencia verificada',
-        currencyCode: 'USD',
-        priceAmount1000: '0',
-        retailerId: 'ShadowCore',
-        url: `https://wa.me/584242773183`,
-        productImageCount: 1
-      },
-      businessOwnerJid: '584242773183@s.whatsapp.net',
-      caption: result,
-      footer: '🌌 Shadow Bot',
-      mentions: [m.sender],
-      contextInfo: {
-        externalAdReply: {
-          showAdAttribution: true,
-          title: '𝐒𝐡𝐚𝐝𝐨𝐰 𝐆𝐚𝐫𝐝𝐞𝐧 • 𝐏𝐢𝐧𝐠',
-          body: 'Shadow System Online',
-          mediaType: 1,
-          thumbnailUrl: 'https://i.ibb.co/ZRLSTYx7/b0243290e236.jpg',
-          sourceUrl: 'https://wa.me/584242773183'
+    // 5. GENERAMOS EL MENSAJE DE PRODUCTO REAL
+    let msg = generateWAMessageFromContent(m.chat, {
+      productMessage: {
+        product: {
+          productImage: { url: 'https://files.catbox.moe/yfdd3r.jpg' },
+          productId: '999999999999999',
+          title: '✨ 𝐏𝐈𝐍𝐆 - 𝐒𝐇𝐀𝐃𝐎𝐖 𝐁𝐎𝐓 ✨',
+          description: 'Latencia del sistema',
+          currencyCode: 'USD',
+          priceAmount1000: '0',
+          retailerId: 'ShadowCore',
+          productImageCount: 1
+        },
+        businessOwnerJid: '584242773183@s.whatsapp.net',
+        caption: result,
+        contextInfo: {
+          externalAdReply: {
+            showAdAttribution: true,
+            title: '𝐒𝐡𝐚𝐝𝐨𝐰 𝐆𝐚𝐫𝐝𝐞𝐧 • 𝐏𝐢𝐧𝐠',
+            body: 'Sistema en línea',
+            mediaType: 1,
+            thumbnailUrl: 'https://i.ibb.co/ZRLSTYx7/b0243290e236.jpg',
+            sourceUrl: 'https://wa.me/584242773183'
+          }
         }
       }
-    }, { quoted: shadow_xyz })
+    }, { quoted: shadow_xyz, userJid: conn.user.jid })
+
+    await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
 
   } catch (e) {
     console.error(e)

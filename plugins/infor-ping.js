@@ -11,11 +11,11 @@ let handler = async (m, { conn }) => {
   let { key } = await conn.reply(m.chat, '❐ 𝐂𝐚𝐥𝐜𝐮𝐥𝐚𝐧𝐝𝐨 𝐏𝐢𝐧𝐠... 🚀', m)
 
   try {
-    // 2. Miniatura pequeña para el quoted (URL solicitada)
+    // 2. Miniatura pequeña para el quoted (Shadow de la URL)
     const res = await fetch('https://i.ibb.co/ZRLSTYx7/b0243290e236.jpg')
     const thumb = Buffer.from(await res.arrayBuffer())
 
-    // 3. Estructura shadow_xyz con TODA la info de catálogo y precio
+    // 3. Estructura shadow_xyz para el quoted
     const shadow_xyz = {
       key: {
         remoteJid: 'status@broadcast',
@@ -33,10 +33,10 @@ let handler = async (m, { conn }) => {
             title: '𝐒𝐡𝐚𝐝𝐨𝐰 𝐆𝐚𝐫𝐝𝐞𝐧 • 𝐏𝐢𝐧𝐠',
             description: 'Shadow team system',
             currencyCode: 'USD',
-            priceAmount1000: '0', // Precio en 0 como pediste
+            priceAmount1000: '0',
             retailerId: 'ShadowCore',
             productImageCount: 1,
-            productId: '999999999999999' // ID de catálogo
+            productId: '999999999999999'
           },
           businessOwnerJid: '584242773183@s.whatsapp.net'
         }
@@ -63,19 +63,30 @@ let handler = async (m, { conn }) => {
     // 4. Borramos el de carga
     await conn.sendMessage(m.chat, { delete: key })
 
-    // 5. Enviamos la imagen final con el quoted shadow_xyz completo
-    await conn.sendMessage(m.chat, { 
-      image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, 
-      caption: result, 
-      mentions: [userId] 
-    }, { quoted: shadow_xyz })
+    // 5. ENVIAMOS EL PRODUCT MESSAGE (Imagen grande con precio y catálogo)
+    const pingProduct = {
+      product: {
+        productImage: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, // Imagen grande del ping
+        productId: '999999999999999',
+        title: '✨ 𝐏𝐈𝐍𝐆 - 𝐒𝐇𝐀𝐃𝐎𝐖 𝐁𝐎𝐓 ✨',
+        description: 'Verificación de latencia del sistema',
+        currencyCode: 'USD',
+        priceAmount1000: '0',
+        retailerId: 'ShadowCore',
+        url: `https://wa.me/584242773183`,
+        productImageCount: 1
+      },
+      businessOwnerJid: '584242773183@s.whatsapp.net',
+      caption: result,
+      footer: '🌌 Shadow Garden Interface',
+      mentions: [m.sender]
+    }
+
+    await conn.sendMessage(m.chat, pingProduct, { quoted: shadow_xyz })
 
   } catch (e) {
-    // Fallback por si falla el fetch
-    await conn.sendMessage(m.chat, { 
-      image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, 
-      caption: '✨ *¡𝐏𝐎𝐍𝐆!* ✨' 
-    }, { quoted: m })
+    console.error(e)
+    await conn.sendMessage(m.chat, { image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, caption: '✨ *¡𝐏𝐎𝐍𝐆!* ✨' }, { quoted: m })
   }
 }
 

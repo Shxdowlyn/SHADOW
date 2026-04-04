@@ -9,13 +9,12 @@ handler.before = async function (m, { conn, isAdmin, isBotAdmin, isOwner, isROwn
   if (!bot.antiSpam) return
   if (m.isGroup && chat.modoadmin) return  
 
-  // No aplicar antispam a dueños, admins o premium
   if (isOwner || isROwner || isAdmin || isPrems) return
 
   const sender = m.sender
   const currentTime = Date.now()
-  const timeWindow = 5000   // 5 segundos
-  const messageLimit = 10   // máximo 10 mensajes en ese tiempo
+  const timeWindow = 5000   
+  const messageLimit = 10   
 
   if (!(sender in userSpamData)) {
     userSpamData[sender] = {
@@ -27,7 +26,6 @@ handler.before = async function (m, { conn, isAdmin, isBotAdmin, isOwner, isROwn
     const userData = userSpamData[sender]
     const timeDifference = currentTime - userData.lastMessageTime
 
-    // Si sigue dentro de la ventana de tiempo, acumula mensajes
     if (timeDifference <= timeWindow) {
       userData.messageCount++
 
@@ -52,11 +50,9 @@ handler.before = async function (m, { conn, isAdmin, isBotAdmin, isOwner, isROwn
           }
         }
 
-        // Reinicia contador
         userData.messageCount = 1
       }
     } else {
-      // Si pasó más tiempo, reinicia el conteo
       userData.messageCount = 1
     }
 

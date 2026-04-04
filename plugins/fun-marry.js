@@ -7,7 +7,6 @@ function tag(jid) {
 const handler = async (m, { conn, command }) => {
   const userId = m.sender
 
-  // Divorcio
   if (['divorce', 'divorciarse'].includes(command)) {
     if (!marriages[userId]) {
       return conn.sendMessage(m.chat, { text: '💔 No estás casado...', ...rcanal }, { quoted: m })
@@ -22,7 +21,6 @@ const handler = async (m, { conn, command }) => {
     )
   }
 
-  // Matrimonio
   if (['marry', 'casarse'].includes(command)) {
     let partnerId = null
     if (m.mentionedJid && m.mentionedJid.length > 0) {

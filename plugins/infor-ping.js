@@ -6,12 +6,10 @@ let handler = async (m, { conn }) => {
   let userName = conn.getName(userId)
   let userNumber = userId.split('@')[0]
   
-  // Enviamos la imagen con el texto de carga para poder editarla después
-  let sentMsg = await conn.sendMessage(m.chat, { 
-    image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, 
-    caption: '❐ 𝐂𝐚𝐥𝐜𝐮𝐥𝐚𝐧𝐝𝐨 𝐏𝐢𝐧𝐠... 🚀' 
-  }, { quoted: m })
-
+  // 1. Mandamos el texto de carga rápido
+  let { key } = await conn.reply(m.chat, '❐ 𝐂𝐚𝐥𝐜𝐮𝐥𝐚𝐧𝐝𝐨 𝐏𝐢𝐧𝐠... 🚀', m)
+  
+  // 2. Calculamos la latencia
   let latency = speed() - timestamp
   let ping = latency.toFixed(0)
 
@@ -20,7 +18,7 @@ let handler = async (m, { conn }) => {
 
 > 🌌 *𝐓𝐢𝐞𝐦𝐩𝐨:* ${ping}𝐦𝐬
 > 👤 *𝐔𝐬𝐮𝐚𝐫𝐢𝐨:* ${userName} (@${userNumber})
-> 👑 *𝐃𝐮𝐞𝐧̃𝐨𝐬:* 𝐘𝐨𝐬𝐮𝐞 (𝐒𝐡𝐚𝐝𝐨𝐰) & 𝐀𝐝𝐨
+> 👑 *𝐃𝐮𝐞𝐧̃𝐨𝐬:* 𝐘𝐨𝐬𝐮 e (𝐒𝐡𝐚𝐝𝐨𝐰) & 𝐀𝐝𝐨
 > 🏎️ *𝐋𝐢𝐧𝐮𝐱 𝐒𝐩𝐞𝐞𝐝:* 𝐌𝐚́𝐱𝐢𝐦𝐚 𝐕𝐞𝐥𝐨𝐜𝐢𝐝𝐚𝐝 🚀
 
 🖥️ *𝐒𝐭𝐚𝐭𝐮𝐬:* 𝐎𝐧𝐥𝐢𝐧𝐞 
@@ -29,10 +27,13 @@ let handler = async (m, { conn }) => {
 
 *જ 𝐒𝐡𝐚𝐝𝐨𝐰 𝐆𝐚𝐫𝐝𝐞𝐧 𝐈𝐧𝐭𝐞𝐫𝐟𝐚𝐜𝐞 🧪 𖤓*`.trim()
 
-  // Editamos el caption de la imagen ya enviada
+  // 3. Borramos el mensaje de "Calculando" para que no estorbe
+  await conn.sendMessage(m.chat, { delete: key })
+
+  // 4. Enviamos la imagen con los resultados finales
   await conn.sendMessage(m.chat, { 
-    text: result, 
-    edit: sentMsg.key, 
+    image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, 
+    caption: result, 
     mentions: [userId] 
   }, { quoted: m })
 }

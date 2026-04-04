@@ -7,20 +7,20 @@ let handler = async (m, { conn }) => {
   let userName = conn.getName(userId)
   let userNumber = userId.split('@')[0]
 
-  // 1. Mandamos el texto de carga rápido (sin esperar al fetch aún)
+  // 1. Mensaje rápido de carga
   let { key } = await conn.reply(m.chat, '❐ 𝐂𝐚𝐥𝐜𝐮𝐥𝐚𝐧𝐝𝐨 𝐏𝐢𝐧𝐠... 🚀', m)
 
   try {
-    // 2. Preparamos la miniatura pequeña para el estilo Business
-    const res = await fetch('https://i.bb.co/ZRLSTxY/b024390e236.jpg')
+    // 2. Miniatura pequeña para el quoted Business
+    const res = await fetch('https://i.ibb.co/ZRLSTYx7/b0243290e236.jpg')
     const thumb = Buffer.from(await res.arrayBuffer())
 
-    // 3. Creamos el mensaje citado (quoted) tipo Business
+    // 3. Estructura exacta de shadow_xyz que pediste
     const shadow_xyz = {
       key: {
         remoteJid: 'status@broadcast',
         fromMe: false,
-        id: 'ShadowPingStatus',
+        id: 'ShadowCatalogAFK',
         participant: '0@s.whatsapp.net'
       },
       message: {
@@ -62,29 +62,18 @@ let handler = async (m, { conn }) => {
     // 4. Borramos el de carga
     await conn.sendMessage(m.chat, { delete: key })
 
-    // 5. Enviamos la imagen final con el quoted especial
+    // 5. Enviamos la imagen final con el quoted shadow_xyz
     await conn.sendMessage(m.chat, { 
       image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, 
       caption: result, 
-      mentions: [userId],
-      contextInfo: {
-        externalAdReply: {
-          title: 'Shadow Garden Interface',
-          body: 'System Status: Optimal',
-          thumbnail: thumb,
-          sourceUrl: 'https://whatsapp.com/channel/120363403739366547@newsletter',
-          mediaType: 1,
-          showAdAttribution: true
-        }
-      }
+      mentions: [userId] 
     }, { quoted: shadow_xyz })
 
   } catch (e) {
-    console.error(e)
-    // Si falla la imagen pequeña, manda la grande normal para no dejarte colgado
+    // Si falla el fetch de la miniatura, manda el resultado con quoted normal para no trabarse
     await conn.sendMessage(m.chat, { 
       image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, 
-      caption: '❌ Error en miniatura, pero aquí el ping rápido.' 
+      caption: '✨ *¡𝐏𝐎𝐍𝐆!* ✨\n\n> 🌌 *𝐓𝐢𝐞𝐦𝐩𝐨:* Rápido ms' 
     }, { quoted: m })
   }
 }

@@ -63,13 +63,13 @@ let handler = async (m, { conn }) => {
     // 4. Borramos el de carga
     await conn.sendMessage(m.chat, { delete: key })
 
-    // 5. ENVIAMOS EL PRODUCT MESSAGE (Siguiendo tu ejemplo de registro)
-    const pingProduct = {
+    // 5. ENVIAMOS COMO PRODUCT MESSAGE REAL (ESTILO REGISTRO)
+    await conn.sendMessage(m.chat, {
       product: {
         productImage: { url: 'https://files.catbox.moe/yfdd3r.jpg' },
         productId: '999999999999999',
         title: '✨ 𝐏𝐈𝐍𝐆 - 𝐒𝐇𝐀𝐃𝐎𝐖 𝐁𝐎𝐓 ✨',
-        description: 'Latencia del sistema',
+        description: 'Latencia verificada',
         currencyCode: 'USD',
         priceAmount1000: '0',
         retailerId: 'ShadowCore',
@@ -84,15 +84,13 @@ let handler = async (m, { conn }) => {
         externalAdReply: {
           showAdAttribution: true,
           title: '𝐒𝐡𝐚𝐝𝐨𝐰 𝐆𝐚𝐫𝐝𝐞𝐧 • 𝐏𝐢𝐧𝐠',
-          body: 'Sistema en línea',
+          body: 'Shadow System Online',
           mediaType: 1,
           thumbnailUrl: 'https://i.ibb.co/ZRLSTYx7/b0243290e236.jpg',
           sourceUrl: 'https://wa.me/584242773183'
         }
       }
-    }
-
-    await conn.sendMessage(m.chat, pingProduct, { quoted: shadow_xyz })
+    }, { quoted: shadow_xyz })
 
   } catch (e) {
     console.error(e)

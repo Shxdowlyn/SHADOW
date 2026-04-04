@@ -20,24 +20,14 @@ function resolvePhoneJid(raw = '') {
 }
 
 function resolveUserJid(rawId, participants, groupId) {
-  const found = participants.find(p =>
-    p.id === rawId || p.lid === rawId || p.jid === rawId
-  )
-
+  const found = participants.find(p => p.id === rawId || p.lid === rawId || p.jid === rawId)
   if (found) {
     const phoneSource = found.phoneNumber || found.pn || found.jid || ''
-    if (phoneSource && !phoneSource.endsWith('@lid')) {
-      return resolvePhoneJid(phoneSource)
-    }
+    if (phoneSource && !phoneSource.endsWith('@lid')) return resolvePhoneJid(phoneSource)
   }
-
   const cached = participantCache[groupId]?.[rawId]
   if (cached) return cached
-
-  if (!rawId.endsWith('@lid')) {
-    return rawId.includes('@') ? rawId : `${rawId}@s.whatsapp.net`
-  }
-
+  if (!rawId.endsWith('@lid')) return rawId.includes('@') ? rawId : `${rawId}@s.whatsapp.net`
   return rawId
 }
 
@@ -57,20 +47,14 @@ let handler = m => m
 handler.before = async function (m, { conn, groupMetadata }) {
   if (!m.messageStubType || !m.isGroup) return !0
 
-  if (groupMetadata?.participants?.length) {
-    cacheParticipants(m.chat, groupMetadata.participants)
-  }
+  if (groupMetadata?.participants?.length) cacheParticipants(m.chat, groupMetadata.participants)
 
   const chat = global.db?.data?.chats?.[m.chat]
   if (!chat || !chat.welcome) return !0
 
   const rawId = m.messageStubParameters[0]
   const userJid = resolveUserJid(rawId, groupMetadata.participants, m.chat)
-
-  if (userJid.endsWith('@lid')) {
-    console.warn('[welcome] No se pudo resolver JID real para:', rawId)
-    return !0
-  }
+  if (userJid.endsWith('@lid')) return !0
 
   const userTag = userJid.split('@')[0]
   const userName = conn.getName(userJid) || userTag
@@ -80,16 +64,23 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const fecha = new Date().toLocaleDateString('es-ES', { timeZone: 'America/Santo_Domingo', day: 'numeric', month: 'long', year: 'numeric' })
   const desc = groupMetadata.desc?.toString() || 'Sin descripción'
 
+  // --- LÓGICA DE BIENVENIDA ---
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
     const welcomeApi = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Bienvenido+a+${encodeURIComponent(groupName)}&text3=Miembro+${groupSize}&avatar=${encodeURIComponent(pp)}`
 
     const caption = chat.welcomeText
       ? chat.welcomeText.replace(/@subject/g, groupName).replace(/@desc/g, desc).replace(/@user/g, `@${userTag}`)
-      : `╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐈𝐍𝐈𝐂𝐈𝐎 」─╮\n\n${userName} ha sido convocado por las sombras...\nBienvenid@ al dominio secreto de *${groupName}*.\n\nTu llegada no es casual. Cada paso será observado.\nTu poder será forjado en silencio. Tu lealtad, puesta a prueba.\n\n╰─「 🌌 𝐈𝐍𝐅𝐎 𝐃𝐄𝐋 𝐆𝐑𝐔𝐏𝐎 」─╯\n🧿 Miembros: ${groupSize}\n📅 Fecha: ${fecha}\n📜 Descripción:\n@user\n\n> Usa *#setwelcome* para personalizar este mensaje.`
+      : `\`\`\`╭─「 👻 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐈𝐍𝐈𝐂𝐈𝐎 」─╮\`\`\`\n\n\`\`\`${userName} ha sido convocado por las sombras...\`\`\`\n\`\`\`Bienvenid@ al dominio secreto de ${groupName}.\`\`\`\n\n\`\`\`Tu llegada no es casual. Cada paso será observado.\`\`\`\n\`\`\`Tu poder será forjado en silencio. Tu lealtad, puesta a prueba.\`\`\`\n\n\`\`\`╰─「 🌌 𝐈𝐍𝐅𝐎 𝐃𝐄𝐋 𝐆𝐑𝐔𝐏𝐎 」─╯\`\`\`\n\`\`\`🧿 Miembros: ${groupSize}\`\`\`\n\`\`\`📅 Fecha: ${fecha}\`\`\`\n\`\`\`📜 Descripción:\`\`\`\n@${userTag}`
 
     await conn.sendMessage(m.chat, {
       image: { url: welcomeApi },
-      caption,
+      caption: caption,
+      footer: `© ${packname} · Welcome`,
+      buttons: [
+        { buttonId: '#reg', buttonText: { displayText: '👤 Registrarme' }, type: 1 },
+        { buttonId: '#menu', buttonText: { displayText: '🌌 Menú' }, type: 1 }
+      ],
+      headerType: 4,
       mentions: [userJid],
       contextInfo: {
         externalAdReply: {
@@ -100,19 +91,26 @@ handler.before = async function (m, { conn, groupMetadata }) {
           showAdAttribution: true
         }
       }
-    }, { quoted: null })
+    }, { quoted: m })
   }
 
+  // --- LÓGICA DE DESPEDIDA ---
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE) {
     const goodbyeApi = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Se+fue+de+${encodeURIComponent(groupName)}&text3=Adiós+Sombra&avatar=${encodeURIComponent(pp)}`
 
     const caption = chat.byeText
       ? chat.byeText.replace(/@subject/g, groupName).replace(/@user/g, `@${userTag}`)
-      : `╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐑𝐄𝐓𝐈𝐑𝐀𝐃𝐀 」─╮\n\n${userName} ha abandonado el círculo de las sombras.\nSu presencia se desvanece... como todo lo que no deja huella.\n\nGrupo: *${groupName}*\n\nQue su memoria permanezca en silencio.\nLas sombras no olvidan, pero tampoco lloran.\n\n╰─「 🌌 𝐄𝐒𝐓𝐀𝐃𝐎 𝐀𝐂𝐓𝐔𝐀𝐋 」─╯\n📉 Miembros: ${groupSize}\n📅 Fecha: ${fecha}\n📜 Descripción:\n@user\n\n> Usa *#setbye* para personalizar este mensaje.`
+      : `\`\`\`╭─「 🌌 𝐒𝐇𝐀𝐃𝐎𝐖 𝐆𝐀𝐑𝐃𝐄𝐍: 𝐑𝐄𝐓𝐈𝐑𝐀𝐃𝐀 」─╮\`\`\`\n\n\`\`\`${userName} ha abandonado el círculo de las sombras.\`\`\`\n\`\`\`Su presencia se desvanece... como todo lo que no deja huella.\`\`\`\n\n\`\`\`Grupo: ${groupName}\`\`\`\n\n\`\`\`Que su memoria permanezca en silencio.\`\`\`\n\`\`\`Las sombras no olvidan, pero tampoco lloran.\`\`\`\n\n\`\`\`╰─「 🌌 𝐄𝐒𝐓𝐀𝐃𝐎 𝐀𝐂𝐓𝐔𝐀𝐋 」─╯\`\`\`\n\`\`\`📉 Miembros: ${groupSize}\`\`\`\n\`\`\`📅 Fecha: ${fecha}\`\`\`\n\`\`\`📜 Descripción:\`\`\`\n@${userTag}`
 
     await conn.sendMessage(m.chat, {
       image: { url: goodbyeApi },
-      caption,
+      caption: caption,
+      footer: `© ${packname} · Goodbye`,
+      buttons: [
+        { buttonId: '#reg', buttonText: { displayText: '👤 Registrarme' }, type: 1 },
+        { buttonId: '#menu', buttonText: { displayText: '🌌 Menú' }, type: 1 }
+      ],
+      headerType: 4,
       mentions: [userJid],
       contextInfo: {
         externalAdReply: {
@@ -123,9 +121,8 @@ handler.before = async function (m, { conn, groupMetadata }) {
           showAdAttribution: true
         }
       }
-    }, { quoted: null })
+    }, { quoted: m })
   }
 }
 
 export default handler
-    

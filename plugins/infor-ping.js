@@ -11,16 +11,16 @@ let handler = async (m, { conn }) => {
   let { key } = await conn.reply(m.chat, '❐ 𝐂𝐚𝐥𝐜𝐮𝐥𝐚𝐧𝐝𝐨 𝐏𝐢𝐧𝐠... 🚀', m)
 
   try {
-    // 2. Miniatura pequeña para el quoted Business
+    // 2. Miniatura pequeña para el quoted (URL solicitada)
     const res = await fetch('https://i.ibb.co/ZRLSTYx7/b0243290e236.jpg')
     const thumb = Buffer.from(await res.arrayBuffer())
 
-    // 3. Estructura exacta de shadow_xyz que pediste
+    // 3. Estructura shadow_xyz con TODA la info de catálogo y precio
     const shadow_xyz = {
       key: {
         remoteJid: 'status@broadcast',
         fromMe: false,
-        id: 'ShadowCatalogAFK',
+        id: 'ShadowCatalogPing',
         participant: '0@s.whatsapp.net'
       },
       message: {
@@ -30,12 +30,13 @@ let handler = async (m, { conn }) => {
               mimetype: 'image/jpeg',
               jpegThumbnail: thumb
             },
-            title: 'WhatsApp Business • Estado',
-            description: 'Shadow team',
+            title: '𝐒𝐡𝐚𝐝𝐨𝐰 𝐆𝐚𝐫𝐝𝐞𝐧 • 𝐏𝐢𝐧𝐠',
+            description: 'Shadow team system',
             currencyCode: 'USD',
-            priceAmount1000: 0,
+            priceAmount1000: '0', // Precio en 0 como pediste
             retailerId: 'ShadowCore',
-            productImageCount: 1
+            productImageCount: 1,
+            productId: '999999999999999' // ID de catálogo
           },
           businessOwnerJid: '584242773183@s.whatsapp.net'
         }
@@ -62,7 +63,7 @@ let handler = async (m, { conn }) => {
     // 4. Borramos el de carga
     await conn.sendMessage(m.chat, { delete: key })
 
-    // 5. Enviamos la imagen final con el quoted shadow_xyz
+    // 5. Enviamos la imagen final con el quoted shadow_xyz completo
     await conn.sendMessage(m.chat, { 
       image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, 
       caption: result, 
@@ -70,10 +71,10 @@ let handler = async (m, { conn }) => {
     }, { quoted: shadow_xyz })
 
   } catch (e) {
-    // Si falla el fetch de la miniatura, manda el resultado con quoted normal para no trabarse
+    // Fallback por si falla el fetch
     await conn.sendMessage(m.chat, { 
       image: { url: 'https://files.catbox.moe/yfdd3r.jpg' }, 
-      caption: '✨ *¡𝐏𝐎𝐍𝐆!* ✨\n\n> 🌌 *𝐓𝐢𝐞𝐦𝐩𝐨:* Rápido ms' 
+      caption: '✨ *¡𝐏𝐎𝐍𝐆!* ✨' 
     }, { quoted: m })
   }
 }

@@ -1,7 +1,3 @@
-// comando_status_bot.js
-// 🕶️ Comando oculto para invocar el informe secreto del bot: uptime, latencia, chats, grupos, memoria, CPU, versiones, propietarios, etc.
-// ⚠️ Solo los que caminan entre sombras sabrán usarlo. Adaptado para baileys/whatsapp.
-
 import os from 'os'
 import { execSync} from 'child_process'
 

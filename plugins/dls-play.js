@@ -28,7 +28,7 @@ const handler = async (m, { conn, text }) => {
 
     const vistas = formatViews(views)
 
-    const res3 = await fetch("https://i.ytimg.com/vi/ID/hqdefault.jpg")
+    const res3 = await fetch("https://i.ibb.co/83pbxQN/5eecaebbc7c3.jpg")
     const thumb3 = Buffer.from(await res3.arrayBuffer())
 
     const fkontak = {

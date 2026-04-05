@@ -48,7 +48,6 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const rawId = m.messageStubParameters[0]
   const userJid = resolveUserJid(rawId, groupMetadata.participants, m.chat)
 
-  // Si sigue siendo LID, intentamos una limpieza manual rápida
   if (userJid.endsWith('@lid')) return !0
 
   const userTag = userJid.split('@')[0]
@@ -65,7 +64,6 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const groupSize = groupMetadata.participants.length
   const fecha = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
 
-  // --- BIENVENIDA ---
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
     const welcomeImg = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Bienvenido+a+${encodeURIComponent(groupName)}&text3=Miembro+${groupSize}&avatar=${encodeURIComponent(pp)}`
 
@@ -94,7 +92,6 @@ handler.before = async function (m, { conn, groupMetadata }) {
     }, { quoted: null })
   }
 
-  // --- DESPEDIDA ---
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE) {
     const goodbyeImg = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Se+fue+de+${encodeURIComponent(groupName)}&text3=Adiós+Sombra&avatar=${encodeURIComponent(pp)}`
 

@@ -1,9 +1,10 @@
 const handler = async (m, { conn }) => {
+  // Este es el contenido que se verá al darle a "Ver código"
   const codeContent = `key: {
     remoteJid: '120363423514187718@g.us',
     remoteJidAlt: undefined,
     fromMe: false,
-    id: 'A54F66F85457C83E39DD96F8167074CF',
+    id: 'A55710042BA2828678DF2B26299FE371',
     participant: '276995896258574@lid',
     participantAlt: '51928616320@s.whatsapp.net',
     addressingMode: 'lid'
@@ -12,13 +13,13 @@ const handler = async (m, { conn }) => {
     extendedTextMessage: ExtendedTextMessage {
       text: '.ver',
       contextInfo: ContextInfo {
-        stanzaId: 'SUKIB9B1F886466F7EFF',
+        stanzaId: 'SUKI236A27D55592C20C',
         participant: '261181826699458@lid',
-        quotedMessage: Message { conversation: '\\ntexto2' }
+        quotedMessage: Message { conversation: 'HTML_CODE_CONTENT...' }
       }
     }
   },
-  id: 'A54F66F85457C83E39DD96F8167074CF',
+  id: 'A55710042BA2828678DF2B26299FE371',
   chat: '120363423514187718@g.us',
   sender: '276995896258574@lid',
   pushName: 'Manuel VG',
@@ -32,13 +33,12 @@ const handler = async (m, { conn }) => {
         body: 'Ver código',
         mediaType: 1,
         previewType: 0,
-        showAdAttribution: true,
         renderLargerThumbnail: false,
-        sourceUrl: 'https://whatsapp.com',
-        thumbnailUrl: 'https://files.catbox.moe/wfd0ze.jpg' // Tu logo de Shadow
+        thumbnailUrl: 'https://files.catbox.moe/wfd0ze.jpg', // Tu logo de Shadow
+        sourceUrl: 'https://whatsapp.com'
       },
-      // Aquí metemos la estructura de quoted que pasaste
-      stanzaId: 'SUKIB9B1F886466F7EFF',
+      // Usamos el ID y participante de tu estructura para que sea idéntico
+      stanzaId: 'SUKI236A27D55592C20C',
       participant: '261181826699458@lid',
       quotedMessage: {
         conversation: codeContent

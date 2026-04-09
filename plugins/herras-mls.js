@@ -1,6 +1,8 @@
 const handler = async (m, { conn }) => {
-  // Este es el contenido que se verá al darle a "Ver código"
-  const codeContent = `key: {
+    const buttonParamsJson = JSON.stringify({
+        title: "Código en Python",
+        display_text: "Ver código",
+        code: `key: {
     remoteJid: '120363423514187718@g.us',
     remoteJidAlt: undefined,
     fromMe: false,
@@ -18,33 +20,29 @@ const handler = async (m, { conn }) => {
         quotedMessage: Message { conversation: 'HTML_CODE_CONTENT...' }
       }
     }
-  },
-  id: 'A55710042BA2828678DF2B26299FE371',
-  chat: '120363423514187718@g.us',
-  sender: '276995896258574@lid',
-  pushName: 'Manuel VG',
-  body: '.ver'`
+  }`
+    })
 
-  await conn.sendMessage(m.chat, {
-    text: 'texto2',
-    contextInfo: {
-      externalAdReply: {
-        title: 'Código en Python',
-        body: 'Ver código',
-        mediaType: 1,
-        previewType: 0,
-        renderLargerThumbnail: false,
-        thumbnailUrl: 'https://files.catbox.moe/wfd0ze.jpg', // Tu logo de Shadow
-        sourceUrl: 'https://whatsapp.com'
-      },
-      // Usamos el ID y participante de tu estructura para que sea idéntico
-      stanzaId: 'SUKI236A27D55592C20C',
-      participant: '261181826699458@lid',
-      quotedMessage: {
-        conversation: codeContent
-      }
+    const msg = {
+        viewOnceMessage: {
+            message: {
+                interactiveMessage: {
+                    body: { text: "texto2" },
+                    footer: { text: "Shadow Bot — MLS" },
+                    nativeFlowMessage: {
+                        buttons: [
+                            {
+                                name: "cta_code",
+                                buttonParamsJson: buttonParamsJson
+                            }
+                        ]
+                    }
+                }
+            }
+        }
     }
-  }, { quoted: m })
+
+    await conn.relayMessage(m.chat, msg, { messageId: m.key.id })
 }
 
 handler.help = ['mls']

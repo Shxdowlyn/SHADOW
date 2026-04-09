@@ -1,15 +1,19 @@
 const handler = async (m, { conn }) => {
-    const code = `key: {
+    // El contenido del código que se abre al dar clic
+    const codeContent = `key: {
     remoteJid: '120363423514187718@g.us',
-    id: 'A55710042BA2828678DF2B26299FE371',
+    fromMe: false,
+    id: 'A54F66F85457C83E39DD96F8167074CF',
     participant: '276995896258574@lid'
   },
-  message: Message {
-    extendedTextMessage: ExtendedTextMessage {
+  body: '.ver',
+  message: {
+    extendedTextMessage: {
       text: '.ver',
       contextInfo: {
-        stanzaId: 'SUKI236A27D55592C20C',
-        participant: '261181826699458@lid'
+        stanzaId: 'SUKIB9B1F886466F7EFF',
+        participant: '261181826699458@lid',
+        quotedMessage: { conversation: '\\ntexto2' }
       }
     }
   }`
@@ -18,8 +22,7 @@ const handler = async (m, { conn }) => {
         viewOnceMessage: {
             message: {
                 interactiveMessage: {
-                    body: { text: "texto2" },
-                    footer: { text: "Shadow Bot — MLS" },
+                    // El botón interactivo que sale en la captura
                     nativeFlowMessage: {
                         buttons: [
                             {
@@ -27,17 +30,19 @@ const handler = async (m, { conn }) => {
                                 buttonParamsJson: JSON.stringify({
                                     display_text: "Ver código",
                                     title: "Código en Python",
-                                    code: code
+                                    code: codeContent
                                 })
                             }
                         ]
                     },
+                    // El "texto2" que aparece abajo del botón en la captura
+                    body: { text: "texto2" },
                     contextInfo: {
-                        // Forzamos el ID que pasaste en la estructura
-                        stanzaId: 'SUKI236A27D55592C20C',
+                        // IDs de tu estructura original
+                        stanzaId: 'SUKIB9B1F886466F7EFF',
                         participant: '261181826699458@lid',
                         quotedMessage: {
-                            conversation: ".mls"
+                            conversation: "\ntexto2"
                         }
                     }
                 }

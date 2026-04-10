@@ -6,10 +6,9 @@ const { generateWAMessageFromContent, proto } = baileys
 
 var handler = async (m, { conn, usedPrefix, command, text }) => {
     let [txt, color] = text.split('|')
-    
-    if (!txt && !m.quoted) return conn.reply(m.chat, '🌑✦ *Shadow Garden* necesita un mensaje o texto.', m)
-    
-    let textoFinal = txt || m.quoted.text
+    let textoFinal = txt || m.quoted?.text || text
+
+    if (!textoFinal) return conn.reply(m.chat, '🌑✦ *Shadow Garden* necesita un mensaje o texto.', m)
 
     if (!color) {
         const colores = [
@@ -25,7 +24,7 @@ var handler = async (m, { conn, usedPrefix, command, text }) => {
         ]
 
         const interactive = proto.Message.InteractiveMessage.fromObject({
-            body: { text: `🌑✦ *Sʜᴀᴅᴏᴡ Gᴀʀᴅᴇɴ Cᴀᴛᴀʟᴏɢᴜᴇ*\n\nEsperando tu elección de color para:\n> *"${textoFinal}"*` },
+            body: { text: `🌑✦ *Sʜᴀᴅᴏᴡ Gᴀʀᴅᴇɴ Cᴀᴛᴀʟᴏɢᴜᴇ*\n\nEsperando tu elección de color para:\n> *"${textoFinal.trim()}"*` },
             footer: { text: "Shadow Garden — The Eminence in Shadow" },
             nativeFlowMessage: {
                 buttons: [{
@@ -52,7 +51,7 @@ var handler = async (m, { conn, usedPrefix, command, text }) => {
         await m.react('🕒')
         
         const apiKey = "yosoyyo_sk_u8qjoidy"
-        const apiUrl = `https://yosoyyo-api-ofc.onrender.com/api/brat?text=${encodeURIComponent(textoFinal)}&color=${color.toLowerCase()}&apiKey=${apiKey}`
+        const apiUrl = `https://yosoyyo-api-ofc.onrender.com/api/brat?text=${encodeURIComponent(textoFinal.trim())}&color=${color.trim().toLowerCase()}&apiKey=${apiKey}`
         
         const response = await axios.get(apiUrl, { responseType: 'arraybuffer' })
 
@@ -85,12 +84,12 @@ var handler = async (m, { conn, usedPrefix, command, text }) => {
 
     } catch (e) {
         await m.react('✖️')
-        conn.reply(m.chat, `⚠️ Error: ${e.message}`, m)
+        console.error(e)
     }
 }
 
 handler.help = ['brat']
 handler.tags = ['sticker']
-handler.command = ['brat', 'bratcolor']
+handler.command = /^(brat|bratcolor)$/i
 
 export default handler

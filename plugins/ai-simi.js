@@ -25,22 +25,20 @@ Ahora responde lo siguiente:
   try {
     const fullPrompt = `${basePrompt} ${text}`
     const url = `https://api.adoolab.xyz/ai/gemini?q=${encodeURIComponent(fullPrompt)}`
-    const response = await axios.get(url)
+    const { data } = await axios.get(url)
     
-    let result = ""
-    
-    if (response.data && response.data.respuesta) {
-      result = response.data.respuesta
-    } else if (response.data && response.data.result) {
-      result = response.data.result
-    } else {
-      result = typeof response.data === 'string' ? response.data : "🤖 No pude procesar la respuesta."
+    let result = data.respuesta || data.result || data.resultado || (typeof data === 'string' ? data : null)
+
+    if (!result && typeof data === 'object') {
+      result = data[Object.keys(data)[0]]
     }
+
+    if (!result) throw new Error("Respuesta vacía")
 
     await conn.reply(m.chat, result, m)
   } catch (error) {
     console.error(error)
-    await conn.reply(m.chat, '*[ 🤖 ] El servicio está saturado, intenta de nuevo.*', m)
+    await conn.reply(m.chat, '*[ 🤖 ] El servicio tiene problemas, intenta de nuevo.*', m)
   }
 }
 

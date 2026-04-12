@@ -29,7 +29,6 @@ Ahora responde lo siguiente:
     const response = await simiAI(fullPrompt)
     await conn.reply(m.chat, response, m)
   } catch (error) {
-    console.error(error)
     await conn.reply(m.chat, '*Error: intenta más tarde.*', m)
   }
 }
@@ -44,9 +43,15 @@ async function simiAI(prompt) {
   try {
     const url = `https://api.adoolab.xyz/ai/gemini?q=${encodeURIComponent(prompt)}`
     const response = await axios.get(url)
-
-    if (response.data?.result) {
-      return response.data.result
+    
+    const res = response.data
+    
+    if (res.result) {
+      return res.result
+    } else if (res.resultado) {
+      return res.resultado
+    } else if (typeof res === 'string') {
+      return res
     } else {
       return "🤖 No pude generar una respuesta, intenta otra vez."
     }
@@ -55,4 +60,4 @@ async function simiAI(prompt) {
     console.error(error)
     throw error
   }
-      }
+}

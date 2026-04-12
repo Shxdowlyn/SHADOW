@@ -107,20 +107,20 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
     let sent = await conn.sendMessage(m.chat, { text: msg }, { quoted: m })
 
     const apiUrl = type === "mp3"
-      ? `https://apiaxi.i11.eu/down/ytaudio?url=${encodeURIComponent(url)}`
+      ? `https://api-gohan.onrender.com/download/ytaudio?url=${encodeURIComponent(url)}`
       : `https://apiaxi.i11.eu/down/ytvideo?url=${encodeURIComponent(url)}`
 
     const response = await fetch(apiUrl)
     const data = await response.json()
 
-    if (!data?.status || !data?.resultado?.url_dl) throw new Error("La API no devolvió un archivo válido.")
+    const downloadUrl = type === "mp3" ? data?.result?.download_url : data?.resultado?.url_dl
+    if (!downloadUrl) throw new Error("La API no devolvió un archivo válido.")
 
-    const fileUrl = data.resultado.url_dl
-    const fileTitle = data.resultado.titulo || title
+    const fileTitle = (type === "mp3" ? data?.result?.title : data?.resultado?.titulo) || title
 
     if (type === "mp3") {
       await conn.sendMessage(m.chat, {
-        audio: { url: fileUrl },
+        audio: { url: downloadUrl },
         mimetype: "audio/mpeg",
         fileName: cleanTitle,
         contextInfo: {
@@ -137,7 +137,7 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
       }, { quoted: m })
     } else {
       await conn.sendMessage(m.chat, {
-        video: { url: fileUrl },
+        video: { url: downloadUrl },
         mimetype: "video/mp4",
         fileName: cleanTitle
       }, { quoted: m })

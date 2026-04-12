@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 let handler = async (m, { conn, usedPrefix, command, text }) => {
-  const username = `${conn.getName(m.sender)}`
   const isOwner = m.sender === '584242773183@s.whatsapp.net'
 
   const basePrompt = `
@@ -28,9 +27,15 @@ Ahora responde lo siguiente:
     const url = `https://api.adoolab.xyz/ai/gemini?q=${encodeURIComponent(fullPrompt)}`
     const response = await axios.get(url)
     
-    let result = response.data.result || response.data.resultado || response.data.respuesta || response.data
-
-    if (typeof result === 'object') result = JSON.stringify(result)
+    let result = ""
+    
+    if (response.data && response.data.respuesta) {
+      result = response.data.respuesta
+    } else if (response.data && response.data.result) {
+      result = response.data.result
+    } else {
+      result = typeof response.data === 'string' ? response.data : "🤖 No pude procesar la respuesta."
+    }
 
     await conn.reply(m.chat, result, m)
   } catch (error) {

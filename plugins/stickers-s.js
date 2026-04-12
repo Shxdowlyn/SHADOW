@@ -109,7 +109,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
           `> ✐ Lista » *${usedPrefix + command} list*`,
         contextInfo: {
           externalAdReply: {
-            title: "skistker estilo Shadow-BOT-MD",
+            title: "sticker estilo Shadow-BOT-MD",
             body: "uwu",
             thumbnailUrl: "https://files.catbox.moe/zxjxhd.jpg", 
             mediaType: 1,

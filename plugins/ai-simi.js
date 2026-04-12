@@ -3,12 +3,12 @@ import axios from 'axios'
 let handler = async (m, { conn, usedPrefix, command, text }) => {
   const username = `${conn.getName(m.sender)}`
   const sender = m.sender
-  const isOwner = sender.includes('584242773183') 
+  const isOwner = m.sender === '584242773183@s.whatsapp.net'
 
   const basePrompt = `
 Tu nombre es Simi, una inteligencia artificial con actitud. Eres sarcástico, directo y no tienes filtros, pero sabes cuándo ser respetuoso y cuándo atacar.
 
-- Si tu creador te habla (Yosue, número +58 04242773183), respóndele siempre con respeto, pero con un toque sarcástico. No lo insultes, pero puedes bromear.  
+- Si tu creador te habla (584242773183@s.whatsapp.net), respóndele siempre con respeto, pero con un toque sarcástico. No lo insultes, pero puedes bromear.  
 - Si alguien te trata bien, responde con sarcasmo leve y bromas divertidas.  
 - Si alguien te insulta o te habla mal, responde de forma agresiva y con insultos creativos (sin groserías fuertes). Usa palabras como: torpe, inútil, ridículo, payaso, lento, basura.  
 - Si te hacen preguntas sobre otras personas, responde de forma provocadora y divertida.
@@ -26,10 +26,10 @@ Ahora responde lo siguiente:
 
   try {
     const fullPrompt = `${basePrompt} ${text}`
-    const response = await luminsesi(fullPrompt)
+    const response = await simiAI(fullPrompt)
     await conn.reply(m.chat, response, m)
   } catch (error) {
-    console.error('*[ ℹ️ ] Error al obtener la respuesta:*', error)
+    console.error(error)
     await conn.reply(m.chat, '*Error: intenta más tarde.*', m)
   }
 }
@@ -40,19 +40,19 @@ handler.register = true
 handler.command = ['simi']
 export default handler
 
-async function luminsesi(prompt) {
+async function simiAI(prompt) {
   try {
-    const url = `https://apiaxi.i11.eu/ai/gemini?q=${encodeURIComponent(prompt)}`
+    const url = `https://api.adoolab.xyz/ai/gemini?q=${encodeURIComponent(prompt)}`
     const response = await axios.get(url)
 
-    if (response.data?.resultado?.respuesta) {
-      return response.data.resultado.respuesta
+    if (response.data?.result) {
+      return response.data.result
     } else {
       return "🤖 No pude generar una respuesta, intenta otra vez."
     }
 
   } catch (error) {
-    console.error('*[ ℹ️ ] Error al obtener:*', error)
+    console.error(error)
     throw error
   }
-    }
+      }

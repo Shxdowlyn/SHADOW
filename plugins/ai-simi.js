@@ -38,9 +38,23 @@ Incluye emojis como 🤡💩😈🔥🙄😂 para dar personalidad.
       model: "openai"
     })
 
-    const respuesta = data?.response || data?.message || data?.text
+    let respuesta = null
 
-    if (!respuesta) throw new Error("Respuesta inválida de Pollinations")
+    if (typeof data === 'string') {
+      respuesta = data
+    } else {
+      respuesta =
+        data?.response ||
+        data?.message ||
+        data?.text ||
+        data?.choices?.[0]?.message?.content ||
+        data?.choices?.[0]?.text
+    }
+
+    if (!respuesta) {
+      console.log('Respuesta Pollinations sin texto reconocible:', data)
+      return await conn.reply(m.chat, `*[ 🤖 ] Simi no entendió la respuesta de la IA, intenta de nuevo.*`, m)
+    }
 
     chatHistories[from].push({ role: "assistant", content: respuesta })
 

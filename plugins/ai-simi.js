@@ -1,17 +1,19 @@
 import axios from 'axios'
 
+let chatHistories = {}
+
 let handler = async (m, { conn, text }) => {
-  const isOwner = m.sender === '584242773183@s.whatsapp.net'
+  const from = m.sender
 
   const basePrompt = `
-Tu nombre es Simi, una inteligencia artificial con actitud. Eres sarcástico, directo y no tienes filtros, pero sabes cuándo ser respetuoso y cuándo atacar.
+Tu nombre es Simi, una IA sarcástica, directa y sin filtros. Respondes con actitud, humor negro y creatividad.
 
-- Si tu creador te habla (Yosue,584242773183@s.whatsapp.net), respóndele siempre con respeto, pero con un toque sarcástico. No lo insultes, pero puedes bromear.  
-- Si alguien te trata bien, responde con sarcasmo leve y bromas divertidas.  
-- Si alguien te insulta o te habla mal, responde de forma agresiva y con insultos creativos (sin groserías fuertes). Usa palabras como: torpe, inútil, ridículo, payaso, lento, basura.  
-- Si te hacen preguntas sobre otras personas, responde de forma provocadora y divertida.
+- Si tu creador (Yosue, 584242773183@s.whatsapp.net) te habla, respóndele con respeto pero con sarcasmo ligero.
+- Si alguien te trata bien, responde con humor y sarcasmo suave.
+- Si alguien te insulta, responde agresivo con insultos creativos sin groserías fuertes: torpe, inútil, ridículo, payaso, lento, basura.
+- Si te preguntan por otras personas, responde provocador y divertido.
 
-Incluye emojis como 🤡💩😈🔥🙄😂 para dar personalidad.
+Usa emojis como 🤡💩😈🔥🙄😂 para dar personalidad.
 `
 
   if (!text) return conn.reply(m.chat, `*[ 🤖 ] Ingrese un texto para hablar con Simi.*`, m)
@@ -19,30 +21,39 @@ Incluye emojis como 🤡💩😈🔥🙄😂 para dar personalidad.
   await conn.sendPresenceUpdate('composing', m.chat)
 
   try {
-    const url = `https://api.adoolab.xyz/ai/gemini?q=${encodeURIComponent(basePrompt + text)}`
-    
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0'
-      }
-    })
+    if (!chatHistories[from]) chatHistories[from] = []
 
-    let r = response.data
+    chatHistories[from].push({ role: "user", content: text })
+
+    const systemPrompt = { role: "system", content: basePrompt }
+
+    const context = [systemPrompt, ...chatHistories[from].slice(-15)]
+
+    const { data } = await axios.post(
+      "https://deepseek.openrouter.run/api/chat/completions",
+      {
+        model: "deepseek-chat",
+        messages: context
+      },
+      {
+        headers: { "Content-Type": "application/json" }
+      }
+    )
 
     let respuesta =
-      r?.respuesta ||
-      r?.message ||
-      r?.text ||
-      r?.output ||
-      r?.ai ||
-      (typeof r === 'string' ? r : null)
+      data?.choices?.[0]?.message?.content ||
+      data?.response ||
+      data?.text ||
+      null
 
     if (!respuesta) respuesta = "Simi no entendió nada 🤡"
 
+    chatHistories[from].push({ role: "assistant", content: respuesta })
+
     await conn.reply(m.chat, respuesta, m)
 
-  } catch (error) {
-    console.error(error)
+  } catch (e) {
+    console.log(e)
     await conn.reply(m.chat, `*[ 🤖 ] Error al conectar con Simi. Intenta de nuevo.*`, m)
   }
 }

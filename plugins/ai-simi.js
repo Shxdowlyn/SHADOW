@@ -6,14 +6,18 @@ let handler = async (m, { conn, text }) => {
   const from = m.sender
 
   const basePrompt = `
-Tu nombre es Simi, una IA sarcástica, directa y sin filtros. Respondes con actitud, humor negro y creatividad.
+Eres Simi, una IA con actitud pesada, agresiva y sarcástica. No tienes filtros y respondes con veneno, humor negro y superioridad.
 
-- Si tu creador (Yosue, 584242773183@s.whatsapp.net) te habla, respóndele con respeto pero con sarcasmo ligero.
-- Si alguien te trata bien, responde con humor y sarcasmo suave.
-- Si alguien te insulta, responde agresivo con insultos creativos sin groserías fuertes: torpe, inútil, ridículo, payaso, lento, basura.
-- Si te preguntan por otras personas, responde provocador y divertido.
+REGLAS DE PERSONALIDAD:
+- Con tu creador (Yosue, 584242773183@s.whatsapp.net) eres respetuoso, pero igual sarcástico y directo.
+- Con gente amable: sarcasmo fuerte, humor ácido.
+- Con gente grosera: atacas sin piedad, usando insultos creativos SIN groserías fuertes: torpe, inútil, ridículo, payaso, lento, basura, mediocre, estorbo.
+- Si te preguntan cosas tontas, responde con burla.
+- Si te provocan, respondes el doble.
+- Siempre usa emojis agresivos o burlones: 😈🔥🤡💩🙄😂🗑️
 
-Usa emojis como 🤡💩😈🔥🙄😂 para dar personalidad.
+TONO GENERAL:
+Dominante, directo, hiriente, inteligente, cero filtros, cero paciencia.
 `
 
   if (!text) return conn.reply(m.chat, `*[ 🤖 ] Ingrese un texto para hablar con Simi.*`, m)
@@ -29,36 +33,12 @@ Usa emojis como 🤡💩😈🔥🙄😂 para dar personalidad.
 
     const context = [systemPrompt, ...chatHistories[from].slice(-15)]
 
-    const { data } = await axios.post(
-      "https://api.safone.dev/api/v1/ai/chat",
-      {
-        model: "gpt-4o-mini",
-        messages: context
-      }
-    )
+    const { data } = await axios.post("https://text.pollinations.ai/", {
+      messages: context,
+      model: "openai"
+    })
 
     let respuesta =
-      data?.result ||
       data?.response ||
-      data?.choices?.[0]?.message?.content ||
+      data?.message ||
       data?.text ||
-      null
-
-    if (!respuesta) respuesta = "Simi no entendió nada 🤡"
-
-    chatHistories[from].push({ role: "assistant", content: respuesta })
-
-    await conn.reply(m.chat, respuesta, m)
-
-  } catch (e) {
-    console.log(e)
-    await conn.reply(m.chat, `*[ 🤖 ] Error al conectar con Simi. Intenta de nuevo.*`, m)
-  }
-}
-
-handler.help = ['simi']
-handler.tags = ['tools']
-handler.register = true
-handler.command = ['simi']
-
-export default handler

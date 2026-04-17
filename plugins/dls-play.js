@@ -66,6 +66,13 @@ const handler = async (m, { conn, text }) => {
         remoteJid: "status@broadcast"
       },
       message: {
+        locationMessage    const fkontak = {
+      key: {
+        fromMe: false,
+        participant: "0@s.whatsapp.net",
+        remoteJid: "status@broadcast"
+      },
+      message: {
         locationMessage: {
           name: `『 ${title} 』`,
           jpegThumbnail: fallbackThumb
@@ -187,4 +194,12 @@ const isYouTubeUrl = (url) => {
 const extractVideoId = (url) => {
   const match =
     url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:[?&/]|\b)/) ||
-    url
+    url.match(/youtu\.be\/([0-9A-Za-z_-]{11})/)
+  return match?.[1] || null
+}
+
+handler.command = ["play"]
+handler.tags = ["descargas"]
+handler.register = true
+
+export default handler

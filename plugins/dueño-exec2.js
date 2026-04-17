@@ -7,7 +7,7 @@ const pluginConfig = {
     alias: ['$', 'ev', 'evaluate', '=>'],
     category: 'owner',
     description: 'Ejecuta código JavaScript (Owner Only)',
-    usage: '=> <code>',
+    usage: '=> <code> o .$ <code>',
     example: '=> m.chat',
     isOwner: true,
     isPremium: false,
@@ -21,33 +21,41 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock, store }) {
-
     if (!config.isOwner(m.sender)) {
         return m.reply('❌ *Solo el amo de las sombras puede usar este poder.*')
     }
 
-    const code = m.fullArgs?.trim() || m.text?.trim().slice(2).trim()
+    const raw = m.text || ''
+    const code = m.fullArgs?.trim() || raw.replace(/^=>\s*/, '').trim()
 
     if (!code) {
         return m.reply(
-`⚙️ *E V A L – S H A D O W  G A R D E N*
-
-Ejecuta código JavaScript en las sombras.
-
-Ejemplos:
-=> 1 + 1
-=> m.chat
-=> groupMetadata.participants
-=> Object.keys(global.db.data)
-`)
+            `⚙️ *E V A L – S H A D O W  G A R D E N*\n\n` +
+            `Ejecuta código JavaScript en las sombras.\n\n` +
+            `Ejemplos:\n` +
+            `=> 1 + 1\n` +
+            `=> m.chat\n` +
+            `=> groupMetadata.participants\n` +
+            `=> Object.keys(global.db.data)\n`
+        )
     }
 
     const db = getDatabase()
+
+    let groupMetadata
+    if (m.isGroup) {
+        try {
+            groupMetadata = await sock.groupMetadata(m.chat)
+        } catch {
+            groupMetadata = null
+        }
+    }
 
     let result
     let isError = false
 
     try {
+        // m, sock, store, db, groupMetadata, config, global quedan en scope del eval
         result = await eval(`(async () => { ${code} })()`)
     } catch (e) {
         isError = true
@@ -55,41 +63,43 @@ Ejemplos:
     }
 
     let output
+    let type
 
     if (typeof result === 'undefined') {
         output = 'Las sombras no devolvieron nada...'
+        type = 'sin valor'
     } else if (result === null) {
         output = 'Vacío como el abismo...'
+        type = 'null'
     } else if (typeof result === 'object') {
         try {
             output = util.inspect(result, { depth: 2, maxArrayLength: 50 })
         } catch {
             output = String(result)
         }
+        type = result?.constructor?.name || 'object'
     } else {
         output = String(result)
+        type = typeof result
     }
 
     if (output.length > 3000) {
         output = output.slice(0, 3000) + '\n\n... (truncado por las sombras)'
     }
 
-    const status = isError ? '❌ Error' : '✅ Success'
-    const type = isError ? result?.name || 'Error' : typeof result
+    const status = isError ? '❌ Error en las sombras' : '✅ Ejecución exitosa'
 
     await m.reply(
-`⚙️ *R E S U L T A D O – E V A L*
-
-╭─「 📋 *I N F O* 」
-│ Estado: ${status}
-│ Tipo: ${type}
-╰───────────────
-
-\`\`\`${output}\`\`\`
-`)
+        `⚙️ *R E S U L T A D O  –  E V A L*\n\n` +
+        `╭─「 📋 *I N F O* 」\n` +
+        `│ Estado: ${status}\n` +
+        `│ Tipo: ${type}\n` +
+        `╰───────────────\n\n` +
+        `\`\`\`${output}\`\`\``
+    )
 }
 
 module.exports = {
     config: pluginConfig,
     handler
-          }
+        }

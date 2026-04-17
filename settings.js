@@ -8,14 +8,11 @@ global.botNumber = ""
 global.owner = [
 // ZONA DE JIDS
 ["584242773183", "yosue </>", true],
+["51921826291", "SoyMaycol", true],
 ["523328418129"],
 ["5491156178758"],
 ["51900373696"],
-["50493732693"],
-// ZONA DE LIDS 
-["", "", true],
-["", "", true], 
-["", "", true]
+["50493732693"]
 ]
 
 global.mods = []
@@ -25,7 +22,7 @@ global.prems = []
 
 global.libreria = "Baileys Multi Device"
 global.vs = "^1.3.2"
-global.nameqr = "shadow"
+global.nameqr = "ShadowBot"
 global.sessions = "Sessions/Principal"
 global.jadi = "Sessions/SubBot"
 global.MichiJadibts = true
@@ -42,7 +39,7 @@ global.catalogo = fs.readFileSync('./lib/catalogo.jpg')
 
 
 global.group = "https://chat.whatsapp.com/D80dadzwRq4LQqFGUntZfK?mode=ems_copy_t"
-global.community = ""
+global.community = "https://chat.whatsapp.com/KCIXMcV2YO9ElYbbmbAeo1"
 global.channel = "https://whatsapp.com/channel/0029VbArz9fAO7RGy2915k3O"
 global.github = "https://github.com"
 global.gmail = "minexdt@gmail.com"

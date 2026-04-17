@@ -1,6 +1,6 @@
-const { getDatabase } = require('../../src/lib/database')
-const config = require('../../config')
-const util = require('util')
+import { getDatabase } from '../../src/lib/database.js'
+import config from '../../config.js'
+import util from 'util'
 
 const pluginConfig = {
     name: 'eval',
@@ -25,31 +25,20 @@ async function handler(m, { sock, store }) {
         return m.reply('❌ *Solo el amo de las sombras puede usar este poder.*')
     }
     
-    const raw = m.text || ''
-    const code = m.fullArgs?.trim() || raw.replace(/^=>\s*/, '').trim()
+    const code = m.fullArgs?.trim() || m.text?.replace(/^=>|^.\$|^\.ev|^\.evaluate/i, '').trim()
     
     if (!code) {
         return m.reply(
-            `⚙️ *E V A L – S H A D O W  G A R D E N*\n\n` +
-            `Ejecuta código JavaScript en las sombras.\n\n` +
-            `Ejemplos:\n` +
-            `=> 1 + 1\n` +
-            `=> m.chat\n` +
-            `=> db.getUser(m.sender)\n`
+            `⚙️ *ᴇᴠᴀʟ – sʜᴀᴅᴏᴡ ɢᴀʀᴅᴇɴ*\n\n` +
+            `> Ejecuta código JavaScript en las sombras.\n\n` +
+            `*¿Acaso tengo que enseñarte todo? (Дурак). Ejemplo:*\n` +
+            `> => 1 + 1\n` +
+            `> => m.chat\n` +
+            `> => db.getUser(m.sender)`
         )
     }
     
     const db = getDatabase()
-
-    let groupMetadata
-    if (m.isGroup) {
-        try {
-            groupMetadata = await sock.groupMetadata(m.chat)
-        } catch {
-            groupMetadata = null
-        }
-    }
-    
     let result
     let isError = false
     
@@ -61,43 +50,38 @@ async function handler(m, { sock, store }) {
     }
     
     let output
-    let type
-
     if (typeof result === 'undefined') {
-        output = 'Las sombras no devolvieron nada...'
-        type = 'sin valor'
+        output = 'undefined'
     } else if (result === null) {
-        output = 'Vacío como el abismo...'
-        type = 'null'
+        output = 'null'
     } else if (typeof result === 'object') {
         try {
             output = util.inspect(result, { depth: 2, maxArrayLength: 50 })
         } catch {
             output = String(result)
         }
-        type = result?.constructor?.name || 'object'
     } else {
         output = String(result)
-        type = typeof result
     }
     
     if (output.length > 3000) {
         output = output.slice(0, 3000) + '\n\n... (truncado por las sombras)'
     }
     
-    const status = isError ? '❌ Error en las sombras' : '✅ Ejecución exitosa'
+    const status = isError ? '❌ Error' : '✅ Success'
+    const type = isError ? result?.name || 'Error' : typeof result
     
     await m.reply(
-        `⚙️ *R E S U L T A D O  –  E V A L*\n\n` +
-        `╭─「 📋 *I N F O* 」\n` +
-        `│ Estado: ${status}\n` +
-        `│ Tipo: ${type}\n` +
-        `╰───────────────\n\n` +
+        `⚙️ *ᴇᴠᴀʟ ʀᴇsᴜʟᴛ*\n\n` +
+        `╭┈┈⬡「 📋 *ɪɴғᴏ* 」\n` +
+        `┃ ${status}\n` +
+        `┃ Type: ${type}\n` +
+        `╰┈┈┈┈┈┈┈┈⬡\n\n` +
         `\`\`\`${output}\`\`\``
     )
 }
 
-module.exports = {
+export default {
     config: pluginConfig,
     handler
-                       }
+        }

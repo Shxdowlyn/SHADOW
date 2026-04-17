@@ -5,7 +5,15 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     return m.reply('❌ *Solo el amo de las sombras puede usar este poder.*')
   }
 
-  let code = text.trim()
+  let raw = m.text || ''
+  let code = ''
+
+  if (/^=>/.test(raw)) {
+    code = raw.replace(/^=>\s*/, '').trim()
+  } else {
+    code = text ? text.trim() : ''
+  }
+
   if (!code) {
     return m.reply(
 `⚙️ *E V A L  –  S H A D O W  G A R D E N*
@@ -16,6 +24,10 @@ Ejemplos:
 ${usedPrefix + command} 1 + 1
 ${usedPrefix + command} m.chat
 ${usedPrefix + command} Object.keys(global.db.data)
+
+O también:
+=> m.chat
+=> 1 + 1
 `)
   }
 
@@ -61,7 +73,8 @@ ${usedPrefix + command} Object.keys(global.db.data)
 
 handler.help = ['eval']
 handler.tags = ['owner']
-handler.command = ['$', 'ev', 'eval', '=>']
+handler.command = ['$', 'ev', 'eval']  // con prefijo: .$ .ev .eval
+handler.customPrefix = /^=>/           // sin prefijo: => código
 handler.rowner = true
 
 export default handler

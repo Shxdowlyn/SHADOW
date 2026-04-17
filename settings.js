@@ -6,9 +6,10 @@ import fs from "fs"
 global.botNumber = "" 
 
 global.owner = [
-// ZONA DE JIDS
+// ZONA DE GUAPOS
 ["584242773183", "yosue </>", true],
 ["51921826291", "SoyMaycol", true],
+// ZONA DE RARITOS
 ["523328418129"],
 ["5491156178758"],
 ["51900373696"],

@@ -66,6 +66,7 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const fecha = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
 
   if (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
+
     const welcomeImg = `https://api.popcat.xyz/welcomecard?background=${encodeURIComponent('https://files.catbox.moe/gbp5x3.jpg')}&text1=${encodeURIComponent(userName)}&text2=Bienvenido+a+${encodeURIComponent(groupName)}&text3=Miembro+${groupSize}&avatar=${encodeURIComponent(pp)}`
 
     const caption = 

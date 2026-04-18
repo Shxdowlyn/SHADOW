@@ -1,33 +1,40 @@
-import speed from 'performance-now'
+import { performance } from 'node:perf_hooks'
 import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
 
-let handler = async (m, { conn, usedPrefix }) => {
-  const start = speed()
+const escapeXml = (str = '') =>
+  String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+
+let handler = async (m, { conn }) => {
+  const start = performance.now()
   const userId = m.sender
-  const userName = conn.getName(userId)
+  const userName = escapeXml(conn.getName(userId) || 'Usuario')
   const userNumber = userId.split('@')[0]
-  const botname = global.author || 'Shadow Bot'
+  const botname = escapeXml(global.author || 'Shadow Bot')
 
   const { key } = await conn.reply(m.chat, '❐ 𝐂𝐚𝐥𝐜𝐮𝐥𝐚𝐧𝐝𝐨 𝐏𝐢𝐧𝐠... 🚀', m)
 
   try {
-    const latency = speed() - start
-    const ping = Math.max(0, Math.round(latency))
+    const ping = Math.max(0, Math.round(performance.now() - start))
     const uptime = process.uptime()
     const hours = Math.floor(uptime / 3600)
     const minutes = Math.floor((uptime % 3600) / 60)
     const seconds = Math.floor(uptime % 60)
     const uptimeText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 
-    const shadowPath = path.resolve('../lib/Shadow.webp')
+    const shadowPath = path.join(process.cwd(), 'lib', 'Shadow.webp')
     const shadowBuffer = fs.existsSync(shadowPath) ? fs.readFileSync(shadowPath) : null
 
     const width = 1600
     const height = 900
 
-    const bg = `
+    const svg = `
 <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
@@ -60,16 +67,20 @@ let handler = async (m, { conn, usedPrefix }) => {
       <feGaussianBlur stdDeviation="8"/>
     </filter>
   </defs>
+
   <rect width="1600" height="900" fill="url(#g1)"/>
   <rect width="1600" height="900" fill="url(#glow1)"/>
   <rect width="1600" height="900" fill="url(#glow2)"/>
+
   <g opacity="0.22">
     <circle cx="1350" cy="130" r="145" fill="#c58cff" filter="url(#soft)"/>
     <circle cx="250" cy="790" r="220" fill="#f4c95d" filter="url(#soft)"/>
   </g>
+
   <g opacity="0.16">
     <path d="M0 680 C210 610, 330 760, 520 690 S860 600, 1040 700 S1330 820, 1600 690 L1600 900 L0 900 Z" fill="#ffffff"/>
   </g>
+
   <g opacity="0.12">
     <path d="M0 120 H1600" stroke="#ffffff" stroke-width="2"/>
     <path d="M0 210 H1600" stroke="#ffffff" stroke-width="1"/>
@@ -78,19 +89,24 @@ let handler = async (m, { conn, usedPrefix }) => {
     <path d="M0 480 H1600" stroke="#ffffff" stroke-width="1"/>
     <path d="M0 570 H1600" stroke="#ffffff" stroke-width="1"/>
   </g>
+
   <g opacity="0.14">
     <path d="M120 90 L260 20 L400 90 L260 160 Z" fill="#f4c95d"/>
     <path d="M1240 740 L1400 660 L1540 740 L1400 820 Z" fill="#c58cff"/>
   </g>
+
   <rect x="78" y="78" width="1444" height="744" rx="42" fill="url(#panel)" stroke="url(#stroke)" stroke-width="3" filter="url(#shadow)"/>
   <rect x="102" y="102" width="1396" height="696" rx="34" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
+
   <text x="120" y="160" fill="#f4c95d" font-size="28" font-family="Arial, Helvetica, sans-serif" letter-spacing="6">KAGE NO JITSURYOKUSHA NI NARITAKUTE</text>
   <text x="120" y="215" fill="#ffffff" font-size="62" font-weight="700" font-family="Arial, Helvetica, sans-serif">P O N G   S H A D O W</text>
   <text x="120" y="252" fill="#cbb6ff" font-size="24" font-family="Arial, Helvetica, sans-serif">Shadow Garden Interface · Performance Card</text>
+
   <g transform="translate(1050 125)">
     <rect x="0" y="0" width="300" height="70" rx="20" fill="#0b0712" stroke="#f4c95d" stroke-opacity="0.9" stroke-width="2"/>
     <text x="150" y="46" text-anchor="middle" fill="#ffffff" font-size="30" font-weight="700" font-family="Arial, Helvetica, sans-serif">${botname}</text>
   </g>
+
   <g transform="translate(120 315)">
     <rect x="0" y="0" width="720" height="370" rx="34" fill="#09060f" fill-opacity="0.72" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
     <text x="34" y="56" fill="#f4c95d" font-size="34" font-weight="700" font-family="Arial, Helvetica, sans-serif">Ping Status</text>
@@ -103,6 +119,7 @@ let handler = async (m, { conn, usedPrefix }) => {
     <rect x="455" y="86" width="220" height="36" rx="18" fill="#f4c95d" fill-opacity="0.18" stroke="#f4c95d" stroke-opacity="0.6"/>
     <text x="565" y="112" text-anchor="middle" fill="#f4c95d" font-size="22" font-family="Arial, Helvetica, sans-serif">LATENCY REPORT</text>
   </g>
+
   <g transform="translate(890 315)">
     <rect x="0" y="0" width="590" height="370" rx="34" fill="#09060f" fill-opacity="0.72" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
     <text x="34" y="56" fill="#c58cff" font-size="34" font-weight="700" font-family="Arial, Helvetica, sans-serif">Shadow Mode</text>
@@ -111,15 +128,16 @@ let handler = async (m, { conn, usedPrefix }) => {
     <text x="34" y="208" fill="#ffffff" font-size="26" font-family="Arial, Helvetica, sans-serif">Sistema: Máxima Velocidad</text>
     <text x="34" y="256" fill="#ffffff" font-size="26" font-family="Arial, Helvetica, sans-serif">Perfil: Convocado por las sombras</text>
     <text x="34" y="304" fill="#ffffff" font-size="26" font-family="Arial, Helvetica, sans-serif">Bot Mode: Activo</text>
-    <text x="34" y="352" fill="#ffffff" font-size="26" font-family="Arial, Helvetica, sans-serif">Owner: Yosue (Shadow) & Ado</text>
+    <text x="34" y="352" fill="#ffffff" font-size="26" font-family="Arial, Helvetica, sans-serif">Owner: Yosue (Shadow) &amp; Ado</text>
     <rect x="362" y="82" width="194" height="44" rx="22" fill="#c58cff" fill-opacity="0.18" stroke="#c58cff" stroke-opacity="0.6"/>
     <text x="459" y="112" text-anchor="middle" fill="#c58cff" font-size="22" font-family="Arial, Helvetica, sans-serif">KAGE VIBES</text>
   </g>
+
   <text x="120" y="820" fill="#ffffff" fill-opacity="0.72" font-size="22" font-family="Arial, Helvetica, sans-serif">Shadow Garden Interface · Ping visual card generated in real time</text>
   <text x="1500" y="820" text-anchor="end" fill="#f4c95d" font-size="22" font-family="Arial, Helvetica, sans-serif">© ${botname}</text>
 </svg>`
 
-    let base = sharp(Buffer.from(bg)).png()
+    let base = sharp(Buffer.from(svg)).png()
 
     if (shadowBuffer) {
       const resized = await sharp(shadowBuffer)
@@ -129,7 +147,7 @@ let handler = async (m, { conn, usedPrefix }) => {
       base = base.composite([{ input: resized, left: 1030, top: 210 }])
     }
 
-    const image = await base.png().toBuffer()
+    const image = await base.toBuffer()
 
     const fkontak = {
       key: {
@@ -156,8 +174,8 @@ let handler = async (m, { conn, usedPrefix }) => {
     }, { quoted: fkontak })
 
   } catch (e) {
-    console.error(e)
-    await conn.sendMessage(m.chat, { text: '❌ Error en el sistema de ping.' }, { quoted: m })
+    console.error('PING ERROR:', e)
+    await conn.sendMessage(m.chat, { text: `❌ Error en el sistema de ping.\n\n${e?.message || e}` }, { quoted: m })
   }
 }
 

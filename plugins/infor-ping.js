@@ -21,7 +21,7 @@ let handler = async (m, { conn, usedPrefix }) => {
     const seconds = Math.floor(uptime % 60)
     const uptimeText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 
-    const shadowPath = path.resolve('./../lib/Shadow.webp')
+    const shadowPath = path.resolve('../lib/Shadow.webp')
     const shadowBuffer = fs.existsSync(shadowPath) ? fs.readFileSync(shadowPath) : null
 
     const width = 1600

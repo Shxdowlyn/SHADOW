@@ -1,9 +1,11 @@
 import axios from 'axios'
 
 let handler = async (m, { conn, text }) => {
+  const from = m.sender
 
   const basePrompt = `
-Tu nombre es Simi. Respondes con humor directo y personalidad fuerte, pero sin atacar a las personas. Mantén un tono juguetón y sarcástico.
+Tu nombre es Simi, una inteligencia artificial con actitud. Eres directo, sarcástico y con personalidad fuerte. Ajusta tu estilo según el usuario que te habla, manteniendo siempre un tono juguetón y creativo.
+
 Ahora responde lo siguiente:
 `
 

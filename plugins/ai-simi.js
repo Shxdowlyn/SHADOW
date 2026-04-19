@@ -28,7 +28,8 @@ Ahora responde lo siguiente:`
     const url = `https://api-gohan.onrender.com/ai/gemini?text=${prompt}`
 
     const { data } = await axios.get(url, {
-      headers: { "User-Agent": "Mozilla/5.0" }
+      headers: { "User-Agent": "Mozilla/5.0" },
+      validateStatus: () => true // 🔥 EVITA QUE AXIOS ENTRE AL CATCH
     })
 
     console.log("Respuesta de la API:", data)
@@ -43,7 +44,7 @@ Ahora responde lo siguiente:`
     await conn.reply(m.chat, respuesta, m)
 
   } catch (e) {
-    console.log(e)
+    console.log("ERROR REAL:", e)
     await conn.reply(m.chat, `*[ 🤖 ] Error al conectar con Simi. Intenta de nuevo.*`, m)
   }
 }

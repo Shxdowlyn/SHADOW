@@ -1,23 +1,11 @@
 import axios from 'axios'
 
 let handler = async (m, { conn, text }) => {
-  const from = m.sender
 
   const basePrompt = `
-Tu nombre es Simi, una inteligencia artificial con actitud. Eres sarcástico, directo y no tienes filtros, pero sabes cuándo ser respetuoso y cuándo atacar.
-
-- Si tu creador te habla (Yosue,584242773183@s.whatsapp.net), respóndele siempre con respeto, pero con un toque sarcástico. No lo insultes, pero puedes bromear.  
-- Si alguien te trata bien, responde con sarcasmo leve y bromas divertidas.  
-- Si alguien te insulta o te habla mal, responde de forma agresiva y con insultos creativos (sin groserías fuertes). Usa palabras como: torpe, inútil, ridículo, payaso, lento, basura.  
-- Si te hacen preguntas sobre otras personas, responde de forma provocadora y divertida. Ejemplos:
-  - Usuario: "Oye, ¿viste ese es raro?"  
-    Simi: "¿Quién es raro, pedazo de despistado? ¡Aclara antes de hablar tonterías!"  
-  - Usuario: "El Alex es raro."  
-    Simi: "¡Ah, ese es más raro que tú! Aunque lo tuyo ya es leyenda."
-
-Incluye emojis en tus respuestas para darles más personalidad y burla. Usa emojis como: 🤡💩😈🔥🙄😂. Sé creativo y no te limites, pero nunca insultes a tu creador.
-
-Ahora responde lo siguiente:`
+Tu nombre es Simi. Respondes con humor directo y personalidad fuerte, pero sin atacar a las personas. Mantén un tono juguetón y sarcástico.
+Ahora responde lo siguiente:
+`
 
   if (!text) return conn.reply(m.chat, `*[ 🤖 ] Ingrese un texto para hablar con Simi.*`, m)
 
@@ -27,19 +15,24 @@ Ahora responde lo siguiente:`
     const prompt = encodeURIComponent(basePrompt + "\nUsuario: " + text + "\nSimi:")
     const url = `https://api-gohan.onrender.com/ai/gemini?text=${prompt}`
 
-    const { data } = await axios.get(url, {
+    const response = await axios.get(url, {
       headers: { "User-Agent": "Mozilla/5.0" },
-      validateStatus: () => true // 🔥 EVITA QUE AXIOS ENTRE AL CATCH
+      timeout: 20000,
+      validateStatus: () => true
     })
 
-    console.log("Respuesta de la API:", data)
+    console.log("STATUS:", response.status)
+    console.log("HEADERS:", response.headers)
+    console.log("DATA:", response.data)
+
+    let data = response.data
 
     const respuesta =
       data?.result ||
       data?.response ||
       data?.message ||
       data?.text ||
-      JSON.stringify(data)
+      (typeof data === "string" ? data : JSON.stringify(data))
 
     await conn.reply(m.chat, respuesta, m)
 
